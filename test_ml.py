@@ -16,16 +16,25 @@ print(y)
 # dmatrix = xgb.DMatrix(X, label=y)
 
 # 定义XGBoost模型
-model = xgb.XGBClassifier(
-    learning_rate=0.1,
-    n_estimators=100
-)
+# model = xgb.XGBClassifier(
+#     learning_rate=0.1,
+#     n_estimators=100
+# )
 
-# 拟合模型
-model.fit(X, y)
+# # 拟合模型
+# model.fit(X, y)
 
-# 进行预测
-predictions = model.predict(np.array(X[0]))
+# # 进行预测
+# predictions = model.predict(np.array(X[0]))
 
-# 输出预测结果
-print(predictions)
+# # 输出预测结果
+# print(predictions)
+
+param = {
+            'max_depth': 2,
+            'eta': 1,
+            'objective': 'reg:squarederror'
+        }
+dtrain = xgb.DMatrix(X, label=y)
+model = xgb.train(param, dtrain, 10)
+print(model.predict(xgb.DMatrix([X[0]])))

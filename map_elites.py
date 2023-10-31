@@ -4,7 +4,7 @@ import xgboost as xgb
 from config import Config
 
 from common import Common
-from config_util import ConfigUtil
+from ml_util import MLUtil
 
 
 class MapElites(object):
@@ -19,14 +19,15 @@ class MapElites(object):
 
         self.dimension = len(self.features)
         self.shape = (self.num_options + 1, )
-        self.archive = np.empty(self.shape, dtype=Config)
+        self.archive = np.empty(self.shape, dtype=object)   # store a (config, val_acquisition) each cell
         self.model = model
 
         self.crossover_rate = 0.7
         self.mutate_rate = 1 - self.crossover_rate
         self.num_init_samples = 2 * self.num_options
 
-        self.best: Config = None
+        self.best_config: Config = None
+        self.best_val_acq = float('-inf')
 
 
     def search_configs(self, iteration: int) -> Config:
@@ -37,12 +38,12 @@ class MapElites(object):
             if i % 20 == 0:
                 print('\tMAP-Elits: iteration {}......'.format(i))
             self.evolve()
-        return self.best
+        return self.best_config
     
 
     def init(self) -> None:
         for i in range(self.num_init_samples):
-            config = ConfigUtil.get_next_sat_config()
+            config = Config.get_next_sat_config()
             self.update_archive(config)
 
 
@@ -63,14 +64,14 @@ class MapElites(object):
 
     
     def mutate(self, config: Config) -> Config:
-        return ConfigUtil.get_next_sat_config()
+        return Config.get_next_sat_config()
     
 
     def get_from_archive(self, indices: list[int]) -> Config:
         tmp = self.archive
         for idx in indices:
             tmp = tmp[idx]
-        return tmp
+        return tmp[0]
 
 
     # 子代Config无法保证有效性
@@ -95,18 +96,15 @@ class MapElites(object):
             idx = self.features[i].get_index(config)
             tmp = self.archive[idx]
         last_idx = self.features[self.dimension - 1].get_index(config)
-        old: Config = tmp[last_idx]
-        val_acquisition = self.f_acquisition(config)
-        if old == None or val_acquisition > self.f_acquisition(old):
-            tmp[last_idx] = config  # update archive
-            if self.best == None or val_acquisition > self.f_acquisition(self.best):
-                self.best = config  # update best
-            print('\t\tBetter config found. old_perf: {}, new_perf: {}'.format(None if old == None else 
-                                                  self.f_acquisition(old), val_acquisition))
-            
-    
-    def f_acquisition(self, config: Config) -> float:
-        return config.get_or_eval_predicted_performance(self.model) # maximum mean
+        old_config: Config = tmp[last_idx][0] if tmp[last_idx] != None else None
+        old_val_acq = tmp[last_idx][1] if tmp[last_idx] != None else None
+        val_acquisition = MLUtil.f_acquisition(config)
+        if old_config == None or val_acquisition > old_val_acq:
+            tmp[last_idx] = (config, val_acquisition)  # update archive
+            if self.best_config == None or val_acquisition > self.best_val_acq:
+                self.best_config = config  # update best
+                self.best_val_acq = MLUtil.f_acquisition(config)
+            print('\t\tBetter config found. old_val_acq: {}, new_val_acq: {}'.format(old_val_acq, val_acquisition))
 
 
 

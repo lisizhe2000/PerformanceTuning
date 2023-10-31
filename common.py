@@ -1,5 +1,6 @@
 import re
 import xml.etree.ElementTree as ET
+import pandas as pd
 from measurement_tree import MeasurementTree
 from pysat.formula import CNF
 from pysat.solvers import Minisat22
@@ -17,29 +18,36 @@ def singleton(class_):
 @singleton
 class Common(object):
 
-    # 在第一次实例化时，需要调用load_data()方法
+    # 在第一次实例化时，需要加载对应数据
     def __init__(self) -> None:       
-        self.fm_name = None
-        self.performance_col_name = None
+        self.sys_name = None
 
         self.num_options = 0
+        self.all_performances = []
+
+        # dimacs way
         self.num_constraints = 0
         self.option_to_id = {}
         self.id_to_option = {}
         self.constraints = []
 
+        # using SAT solver
         self.cnf = None
         self.solver = None
         self.sat_config_iter = None
 
+        # for xml
+        self.performance_col_name = None
         self.measurement_tree = MeasurementTree()
-        self.all_performances = []
+
+        # for configs pool
+        self.configs_pool = None
 
 
-    def parse_dimacs(self) -> None:
+    def __parse_dimacs(self) -> None:
         prefix = './Data/FM/'
         subfix = '.dimacs'
-        path = prefix + self.fm_name + subfix
+        path = prefix + self.sys_name + subfix
         with open(path, 'r') as f:
             line = f.readline()
             while line:
@@ -57,10 +65,10 @@ class Common(object):
                 line = f.readline()             
 
 
-    def parse_measurements(self) -> None:
+    def __parse_measurements(self) -> None:
         prefix = './Data/AllMeasurements/'
         subfix = '_raw_bin.xml'
-        path = prefix + self.fm_name + subfix
+        path = prefix + self.sys_name + subfix
         tree = ET.parse(path)
         results = tree.getroot()
 
@@ -84,12 +92,29 @@ class Common(object):
             self.measurement_tree.make_measurement_node(config_options_list, performance)
 
 
-    def load_data(self, fm_name: str, performance_col_name: str) -> None:
-        self.fm_name = fm_name
+    def load_xml(self, sys_name: str, performance_col_name: str) -> None:
+        self.sys_name = sys_name
         self.performance_col_name = performance_col_name
-        self.parse_dimacs()
-        self.parse_measurements()
-        dimacs_path = './Data/FM/' + self.fm_name + '.dimacs'
+        self.__parse_dimacs()
+        self.__parse_measurements()
+        dimacs_path = './Data/FM/' + self.sys_name + '.dimacs'
         self.cnf = CNF(from_file=dimacs_path)
         self.solver = Minisat22(bootstrap_with=self.cnf)
         self.sat_config_iter = self.solver.enum_models()
+
+    
+    def load_csv(self, sys_name: str) -> None:
+        from config import Config
+        self.configs_pool: list[Config] = []
+        csv_path = './Data/CsvMeasurements/' + sys_name + '.csv'
+        df = pd.read_csv(csv_path)
+        
+        self.num_options = len(df.columns) - 1
+
+        for _, row in df.iterrows():
+            row = row.tolist()
+            config_options = [True if option == 1 else False for option in row[:-1]]
+            performance = row[-1]
+            config = Config(config_options, performance=performance)
+            self.all_performances.append(performance)
+            self.configs_pool.append(config)

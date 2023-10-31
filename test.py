@@ -3,8 +3,9 @@ from functools import reduce
 import xgboost as xgb
 from config import Config
 from common import Common
-from config_util import ConfigUtil
+from distance_util import DistanceUtil
 from expr_util import ExprUtil
+from init_samples import InitSampling
 from map_elites import Feature, MapElites
 from measurement_tree import MeasurementTree
 from sail import Sail
@@ -14,7 +15,8 @@ class Test():
     def __init__(self):
         self.data = Common()
         # self.data.load_data('HSMGP', 'AverageTimePerIteration')
-        self.data.load_data('Dune', 'Performance')
+        # self.data.load_xml('Dune', 'Performance')
+        self.data.load_csv('Apache')
     
     def test_parse_dimacs(self):
         print('numOptions: ', self.data.num_options)
@@ -46,7 +48,7 @@ class Test():
         sail = Sail()
         configs = sail.get_init_samples()
         for i in range(len(configs)):
-            print(configs[i].get_selected_options_names(), configs[i].get_or_eval_real_performance())
+            print(configs[i].get_selected_options_names(), configs[i].get_real_performance())
 
     def test_get_feature_index(self):
         num_options = Common().num_options
@@ -69,7 +71,11 @@ class Test():
 
     def test_gen_random_config(self):
         for i in range(5):
-            print(ConfigUtil.gen_random_config().to_bin_str())
+            print(Config.gen_random_config().to_bin_str())
+
+    def test_gen_next_sat_config(self):
+        for _ in range(5):
+            print(Config.get_next_sat_config().to_bin_str())
 
     def test_init_model(self) -> xgb.Booster:
         sail = Sail()
@@ -97,10 +103,28 @@ class Test():
     def test_sail(self):
         sail = Sail()
         config = sail.search_optimal_config()
-        print(f'Rank: {ExprUtil.get_rank(config)}, config: {config.get_selected_options_names()}, performance: {config.get_or_eval_real_performance()}, num of all config: {len(Common().all_performances)}')
+        print(f'Rank: {ExprUtil.get_rank(config)}, config: {config.get_selected_options_names()}, performance: {config.get_real_performance()}, num of all config: {len(Common().all_performances)}')
         with open('./res', 'a') as f:
-            f.write(f'Rank: {ExprUtil.get_rank(config)}, config: {config.get_selected_options_names()}, performance: {config.get_or_eval_real_performance()}\n')
-                
+            f.write(f'Rank: {ExprUtil.get_rank(config)}, config: {config.get_selected_options_names()}, performance: {config.get_real_performance()}\n')
+
+    def test_load_csv(self):
+        self.data.load_csv('Apache')
+        print(f'len configs pool: {len(Common().configs_pool)}')
+        print([config.to_bin_str() for config in Common().configs_pool])
+        print([config.get_real_performance() for config in Common().configs_pool])
+
+    def test_hamming_distance(self):
+        config_a = Common().configs_pool[0]
+        config_b = Common().configs_pool[1]
+        print(config_a.to_bin_str())
+        print(config_b.to_bin_str())
+        distance = DistanceUtil.hamming_distance(config_a, config_b)
+        print(distance)
+        assert distance == 2
+
+    def test_fscs(self):
+        samples = InitSampling.fixed_size_candidate_set(5)
+        print([config.to_bin_str() for config in samples])
         
 
 if __name__ == '__main__':
@@ -111,10 +135,14 @@ if __name__ == '__main__':
     # test.test_get_init_samples()
     # test.test_get_feature_index()
     # test.test_gen_random_config()
+    # test.test_gen_next_sat_config()
     
     # print('rank:{}, num of all config:{}'.format(len(Common().all_performances), ExprUtil.get_rank(37938.39285714286)))
     # model = test.test_init_model()
     # test.test_map_init(model)
     # test.test_map_elites(model)
 
-    test.test_sail()
+    # test.test_sail()
+    # test.test_load_csv()
+    # test.test_hamming_distance()
+    test.test_fscs()

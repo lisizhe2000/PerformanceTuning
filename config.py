@@ -1,36 +1,35 @@
+from __future__ import annotations
 from functools import reduce
+import random
 import numpy as np
-import xgboost as xgb
 from common import Common
 
 
 class Config(object):
 
 
-    def __init__(self, config_options: list[bool]) -> None:
+    def __init__(self, config_options: list[bool], performance: float = None) -> None:
         assert(len(config_options) == Common().num_options)
 
         self.config_options = config_options
-        self.__real_perf_evaluated = False
-        self.__pred_perf_evalueted = False
-        self.__real_performance = None
-        self.__predicted_performance = None
-    
 
-    # 可能不存在，会抛异常，需要进行异常处理
-    def get_or_eval_real_performance(self) -> float:
+        # Generated config, performance unknown
+        if performance == None:
+            self.__real_perf_evaluated = False
+            self.__real_performance = None
+        # Config from pool, performance already known
+        else:
+            self.__real_perf_evaluated = True
+            self.__real_performance = performance
+
+
+    # 如果从xml中读取，可能不存在，会抛异常，需要进行异常处理
+    # 缓存未命中时复杂度为O(n)，n为num_options
+    def get_real_performance(self) -> float:
         if not self.__real_perf_evaluated:
-            # self.eval_real_performance()
             self.__real_performance = Common().measurement_tree.get_performance(self.config_options)
             self.__real_perf_evaluated = True
         return self.__real_performance
-    
-
-    def get_or_eval_predicted_performance(self, model: xgb.Booster) -> float:
-        if not self.__pred_perf_evalueted:
-            self.__predicted_performance = model.predict(xgb.DMatrix(np.array([self.config_options])))[0]
-            self.__pred_perf_evalueted = True
-        return self.__predicted_performance
     
 
     def to_bin_str(self) -> str:
@@ -48,3 +47,30 @@ class Config(object):
                 config_names += ','
         config_names = config_names[:-1]
         return config_names
+    
+
+    # 该方法需要尝试几十万上百万次才能找到一个有效配置，效率极低
+    # 或许加载mandatory和dead后能提高n倍效率（n = 2 ** (num_mandatory + num_dead)）
+    @DeprecationWarning
+    @classmethod
+    def gen_random_config(cls) -> Config:
+        print('generating random config......')
+        performance = None
+        while performance == None:
+            try:
+                num_selected = np.random.randint(Common().num_options + 1)
+                config_options = [True] * num_selected + [False] * (Common().num_options - num_selected)
+                random.shuffle(config_options)
+                config = cls(config_options)
+                performance = config.get_or_eval_real_performance()
+            except:
+                pass
+        print('generation done. config = {}'.format(config))
+        return config
+    
+    
+    @classmethod
+    def get_next_sat_config(cls) -> Config:
+        solution = next(Common().sat_config_iter, None)
+        config_options = [True if lit > 0 else False for lit in solution]
+        return cls(config_options)

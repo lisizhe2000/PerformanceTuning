@@ -3,7 +3,6 @@ import numpy as np
 import xgboost as xgb
 from config import Config
 from common import Common
-from config_util import ConfigUtil
 from map_elites import MapElites
 
 class Sail(object):
@@ -19,7 +18,7 @@ class Sail(object):
     def get_init_samples(self) -> list[Config]:
         prefix = './Data/InitSamples/'
         subfix = '.dimacs.samples'
-        path = prefix + Common().fm_name + subfix
+        path = prefix + Common().sys_name + subfix
 
         configs = []
 
@@ -34,7 +33,7 @@ class Sail(object):
                 config = Config(config_list)
 
                 try:
-                    config.get_or_eval_real_performance()
+                    config.get_real_performance()
                     configs.append(config)
                 except:
                     config_names = ''
@@ -53,7 +52,7 @@ class Sail(object):
     def init_model(self) -> xgb.Booster:
         configs = self.get_init_samples()
         self.X = np.array([config.config_options for config in configs])
-        self.y = np.array([config.get_or_eval_real_performance() for config in configs])
+        self.y = np.array([config.get_real_performance() for config in configs])
         return self.train_model()
 
 
@@ -74,8 +73,8 @@ class Sail(object):
             map_elites = MapElites(model)
             try:
                 config = map_elites.search_configs(self.rounds_map_elites)
-                performance = config.get_or_eval_real_performance()
-                if best == None or performance > best.get_or_eval_real_performance():
+                performance = config.get_real_performance()
+                if best == None or performance > best.get_real_performance():
                     best = config
                 self.X = np.append(self.X, [config.config_options], axis=0)
                 self.y = np.append(self.y, performance)
@@ -87,8 +86,8 @@ class Sail(object):
         print('Sail: Start optimization phase')
         try:
             config = map_elites.search_configs(self.rounds_map_elites)
-            performance = config.get_or_eval_real_performance()
-            if best == None or performance > best.get_or_eval_real_performance():
+            performance = config.get_real_performance()
+            if best == None or performance > best.get_real_performance():
                 best = config
         except:
             print('Error evaluating performance, config: {}'.format(None if best == None else best.get_selected_options_names()))
