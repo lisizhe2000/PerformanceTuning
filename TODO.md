@@ -42,3 +42,7 @@
     1. 调整xgboost参数
     2. 换其他的机器学习模型
     3. 用FLASH的CART
+
+### 增加其他类型的config option
+
+    之前只有bool类型变量，要把bool+数值型的加上来
