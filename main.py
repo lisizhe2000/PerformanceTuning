@@ -1,9 +1,9 @@
-from common import Common
-from config import Config
-from expr_util import ExprUtil
-from incremental_samples import IncrementalSampling
-from init_samples import InitSampling
-from ml_util import MLUtil
+from data_processing.common import Common
+from util.config import Config
+from util.expr_util import ExprUtil
+from sampling.incremental_samples import IncrementalSampling
+from sampling.init_samples import InitSampling
+from util.ml_util import MLUtil
 
 
 if __name__ == '__main__':

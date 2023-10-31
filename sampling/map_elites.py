@@ -1,10 +1,10 @@
 from functools import reduce
 import numpy as np
 import xgboost as xgb
-from config import Config
+from util.config import Config
 
-from common import Common
-from ml_util import MLUtil
+from data_processing.common import Common
+from util.ml_util import MLUtil
 
 
 class MapElites(object):

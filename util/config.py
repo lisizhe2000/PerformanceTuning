@@ -2,7 +2,7 @@ from __future__ import annotations
 from functools import reduce
 import random
 import numpy as np
-from common import Common
+from data_processing.common import Common
 
 
 class Config(object):

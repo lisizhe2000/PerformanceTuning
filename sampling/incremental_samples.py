@@ -1,7 +1,7 @@
 from typing import Callable
-from common import Common
-from config import Config
-from ml_util import MLUtil
+from data_processing.common import Common
+from util.config import Config
+from util.ml_util import MLUtil
 
 
 class IncrementalSampling(object):

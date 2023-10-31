@@ -1,14 +1,14 @@
 from functools import reduce
 
 import xgboost as xgb
-from config import Config
-from common import Common
-from distance_util import DistanceUtil
-from expr_util import ExprUtil
-from init_samples import InitSampling
-from map_elites import Feature, MapElites
-from measurement_tree import MeasurementTree
-from sail import Sail
+from util.config import Config
+from data_processing.common import Common
+from util.distance_util import DistanceUtil
+from util.expr_util import ExprUtil
+from sampling.init_samples import InitSampling
+from sampling.map_elites import Feature, MapElites
+from data_processing.measurement_tree import MeasurementTree
+from sampling.sail import Sail
 
 class Test():
 

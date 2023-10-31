@@ -1,9 +1,9 @@
 from typing import Callable
 
 import numpy as np
-from common import Common
-from config import Config
-from distance_util import DistanceUtil
+from data_processing.common import Common
+from util.config import Config
+from util.distance_util import DistanceUtil
 
 
 class InitSampling(object):

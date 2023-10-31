@@ -1,8 +1,8 @@
 import re
 import numpy as np
 import xgboost as xgb
-from config import Config
-from common import Common
+from util.config import Config
+from data_processing.common import Common
 from map_elites import MapElites
 
 class Sail(object):

@@ -1,5 +1,5 @@
 import math
-from common import Common
+from data_processing.common import Common
 from config import Config
 
 

@@ -1,7 +1,7 @@
 import re
 import xml.etree.ElementTree as ET
 import pandas as pd
-from measurement_tree import MeasurementTree
+from data_processing.measurement_tree import MeasurementTree
 from pysat.formula import CNF
 from pysat.solvers import Minisat22
 
@@ -104,7 +104,7 @@ class Common(object):
 
     
     def load_csv(self, sys_name: str) -> None:
-        from config import Config
+        from util.config import Config
         self.configs_pool: list[Config] = []
         csv_path = './Data/CsvMeasurements/' + sys_name + '.csv'
         df = pd.read_csv(csv_path)
