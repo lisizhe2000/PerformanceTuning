@@ -30,3 +30,17 @@ class IncrementalSampling(object):
     def batch_sample_nslc(already_sampled: list[Config]) -> list[Config]:
         # TODO
         pass
+
+
+    @staticmethod
+    def maximum_mean_in_once_prediction(already_sampled: list[Config]) -> Config:
+        pool = Common().configs_pool
+        configs = [config for config in pool if config not in already_sampled]
+        predictions = MLUtil.f_precict_all(configs)
+        max_mean = float('-inf')
+        best = None
+        for i in range(len(predictions)):
+            if predictions[i] >  max_mean:
+                max_mean = predictions[i]
+                best = configs[i]
+        return best

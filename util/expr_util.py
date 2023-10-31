@@ -1,6 +1,6 @@
 import math
 from data_processing.common import Common
-from config import Config
+from util.config import Config
 
 
 class ExprUtil(object):
