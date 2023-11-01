@@ -104,6 +104,7 @@ class Common(object):
 
     
     def load_csv(self, sys_name: str) -> None:
+        self.sys_name = sys_name
         from util.config import Config
         self.configs_pool: list[Config] = []
         csv_path = './Data/CsvMeasurements/' + sys_name + '.csv'

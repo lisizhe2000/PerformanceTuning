@@ -5,12 +5,15 @@ import xgboost as xgb
 from util.config import Config
 from typing import Callable
 
+from util.time_counter import timeit
+
 
 # Meachine Learning Util
 class MLUtil(object):
 
 
     model = None
+    model_name = None
     f_predict: Callable[[Config], float] = None
     f_precict_all: Callable[[list[Config]], np.ndarray] = None
     f_train: Callable[[list[Config]], None] = None  # Train the model above
@@ -25,7 +28,9 @@ class MLUtil(object):
             'objective': 'reg:squarederror'
         }
         MLUtil.model: xgb.Booster = None
+        MLUtil.model_name = 'xgboost'
 
+        @timeit
         def train(configs: list[Config]) -> None:
             X = np.array([config.config_options for config in configs])
             y = np.array([config.get_real_performance() for config in configs])
@@ -42,7 +47,9 @@ class MLUtil(object):
     @staticmethod
     def using_cart() -> None:
         MLUtil.model = DecisionTreeRegressor()
+        MLUtil.model_name = 'CART'
 
+        @timeit
         def train(configs: list[Config]) -> None:
             X = np.array([config.config_options for config in configs])
             y = np.array([config.get_real_performance() for config in configs])

@@ -123,7 +123,7 @@ class Test():
         assert distance == 2
 
     def test_fscs(self):
-        samples = InitSampling.fixed_size_candidate_set(5)
+        samples = InitSampling.fscs(5)
         print([config.to_bin_str() for config in samples])
         
 

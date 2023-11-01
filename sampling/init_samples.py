@@ -1,14 +1,11 @@
-from typing import Callable
-
 import numpy as np
 from data_processing.common import Common
 from util.config import Config
 from util.distance_util import DistanceUtil
+from util.time_counter import timeit
 
 
 class InitSampling(object):
-
-    f_init_samples: Callable[[], list[Config]] = None
 
 
     @staticmethod
@@ -24,7 +21,9 @@ class InitSampling(object):
 
 
     @staticmethod
-    def fixed_size_candidate_set(size: int) -> list[Config]:
+    @timeit
+    # fixed-size-candidate-set
+    def fscs(size: int) -> list[Config]:
         samples = []
         pool = Common().configs_pool
         num_all_valid = len(pool)
