@@ -13,18 +13,18 @@ def main():
     start_time = time.perf_counter()
 
     Common().load_csv('SQL')
-    MLUtil.using_cart()
+    MLUtil.using_random_forest_max_val()
 
-    init_size = 15
-    total_size = 40
+    init_size = 10
+    total_size = 30
     f_init_sampling = InitSampling.fscs
-    f_incremental_sampling = IncrementalSampling.maximum_mean_in_once_prediction
+    f_incremental_sampling = IncrementalSampling.max_acquisition_in_once
     
     samples = f_init_sampling(init_size)
     while len(samples) < total_size:
         MLUtil.f_train(samples)
         new = f_incremental_sampling(samples)
-        if type(new) == list:   # batch sampling
+        if type(new) == list or type(new) == tuple:   # batch sampling
             samples.extend(new)
         else:                   # single sampling
             samples.append(new)
@@ -39,6 +39,7 @@ def main():
         Common().sys_name,
         f_init_sampling.__name__,
         f_incremental_sampling.__name__,
+        MLUtil.acquisition_function_name,
         init_size,
         total_size,
         MLUtil.model_name,

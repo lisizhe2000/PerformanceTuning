@@ -1,16 +1,16 @@
-from typing import Callable
+import random
 from data_processing.common import Common
 from util.config import Config
+from util.distance_util import DistanceUtil
 from util.ml_util import MLUtil
+from util.time_counter import timeit
 
 
 class IncrementalSampling(object):
 
-    f_single_sampling: Callable[[], Config] = None
-    f_batch_sampling: Callable[[], Config] = None
-
 
     @staticmethod
+    @timeit
     def single_sample(already_sampled: list[Config]) -> Config:
         pool = Common().configs_pool
         best_config = None
@@ -27,20 +27,67 @@ class IncrementalSampling(object):
 
 
     @staticmethod
-    def batch_sample_nslc(already_sampled: list[Config]) -> list[Config]:
-        # TODO
-        pass
-
-
-    @staticmethod
-    def maximum_mean_in_once_prediction(already_sampled: list[Config]) -> Config:
+    def batch_sample_knn_substitution(already_sampled: list[Config]) -> tuple[Config]:
         pool = Common().configs_pool
         configs = [config for config in pool if config not in already_sampled]
-        predictions = MLUtil.f_precict_all(configs)
-        max_mean = float('-inf')
+        predicted_perfs = MLUtil.f_precict_all(configs)
+        configs = list(zip(configs, predicted_perfs))
+        random.shuffle(configs)
+
+        archive = []
+        n = 5
+        k = 3
+        
+        for config, predicted_perf in configs:
+            
+            if len(archive) < n:
+                archive.append((config, predicted_perf))
+                continue
+            
+            distances = []
+            for arc_conf, _ in archive:
+                d = DistanceUtil.hamming_distance(arc_conf, config)
+                distances.append(d)
+            
+            # find config's knn in archive
+            knn_id = []
+            for _ in range(k):
+                furthest_d = float('-inf')
+                furthest_id = None
+                for i in range(n):
+                    d = distances[i]
+                    if i not in knn_id and d > furthest_d:
+                        furthest_d = d
+                        furthest_id = i
+                knn_id.append(furthest_id)
+            
+            # find the config that it's predicted performance is worst
+            worst_perf_in_knn = float('inf')
+            worst_perf_id_in_knn = None
+            for i in range(n):
+                arc_pred_perf = archive[i][1]
+                if arc_pred_perf > worst_perf_in_knn:
+                    worst_perf_in_knn = arc_pred_perf
+                    worst_perf_id_in_knn = i
+            # substitute if config is better than the worst
+            if predicted_perf > worst_perf_in_knn:
+                archive[worst_perf_id_in_knn] = (config, predicted_perf)
+        
+        new_samples, _ = zip(*archive)
+        return new_samples
+            
+
+    @staticmethod
+    @timeit
+    # 一次预测完所有的，速度要快几十上百倍
+    def max_acquisition_in_once(already_sampled: list[Config]) -> Config:
+        pool = Common().configs_pool
+        configs = [config for config in pool if config not in already_sampled]
+        acq_vals = MLUtil.f_acquist_all(configs)
+        max_acq_val = float('-inf')
         best = None
-        for i in range(len(predictions)):
-            if predictions[i] >  max_mean:
-                max_mean = predictions[i]
+        for i in range(len(acq_vals)):
+            if acq_vals[i] > max_acq_val:
+                max_acq_val = acq_vals[i]
                 best = configs[i]
         return best
