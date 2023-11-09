@@ -114,7 +114,8 @@ class Common(object):
 
         for _, row in df.iterrows():
             row = row.tolist()
-            config_options = [True if option == 1 else False for option in row[:-1]]
+            # config_options = [True if option == 1 else False for option in row[:-1]]
+            config_options = row[:-1]
             performance = row[-1]
             config = Config(config_options, performance=performance)
             self.all_performances.append(performance)

@@ -34,7 +34,7 @@ class InitSampling(object):
             for config in pool:
                 distance = 0
                 for sample in samples:
-                    distance += DistanceUtil.hamming_distance(config, sample)
+                    distance += DistanceUtil.f_get_distance(config, sample)
                 if furthest_config is None or furthest_distance < distance:
                     furthest_config = config
                     furthest_distance = distance

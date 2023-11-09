@@ -8,7 +8,7 @@ from data_processing.common import Common
 class Config(object):
 
 
-    def __init__(self, config_options: list[bool], performance: float = None) -> None:
+    def __init__(self, config_options: list[ int | float ], performance: float = None) -> None:
         assert(len(config_options) == Common().num_options)
 
         self.config_options = config_options
@@ -32,6 +32,7 @@ class Config(object):
         return self.__real_performance
     
 
+    # for bool type config
     def to_bin_str(self) -> str:
         bin_str = ''
         for option in self.config_options:
@@ -39,6 +40,7 @@ class Config(object):
         return bin_str
     
 
+    # for bool type config
     def get_selected_options_names(self) -> str:
         config_names = ''
         for i in range(Common().num_options):

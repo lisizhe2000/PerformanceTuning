@@ -46,7 +46,7 @@ class IncrementalSampling(object):
             
             distances = []
             for arc_conf, _ in archive:
-                d = DistanceUtil.hamming_distance(arc_conf, config)
+                d = DistanceUtil.f_get_distance(arc_conf, config)
                 distances.append(d)
             
             # find config's knn in archive

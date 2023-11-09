@@ -46,7 +46,7 @@ class MLUtil(object):
         MLUtil.f_precict_all = lambda configs: MLUtil.__model.predict(xgb.DMatrix(MLUtil.__configs_to_nparray(configs)))
         MLUtil.f_acquisition = MLUtil.f_predict
         MLUtil.f_acquist_all = MLUtil.f_precict_all
-        MLUtil.acquisition_function_name = 'max_predicted_val'
+        MLUtil.acquisition_function_name = 'predicted_val'
 
 
     @staticmethod
@@ -59,7 +59,7 @@ class MLUtil(object):
         MLUtil.f_precict_all = lambda configs: MLUtil.__model.predict(MLUtil.__configs_to_nparray(configs))
         MLUtil.f_acquisition = MLUtil.f_predict
         MLUtil.f_acquist_all = MLUtil.f_precict_all
-        MLUtil.acquisition_function_name = 'max_predicted_val'
+        MLUtil.acquisition_function_name = 'predicted_val'
 
 
     @staticmethod

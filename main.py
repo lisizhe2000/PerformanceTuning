@@ -1,6 +1,7 @@
 import csv
 import time
 from data_processing.common import Common
+from util.distance_util import DistanceUtil
 from util.expr_util import ExprUtil
 from sampling.incremental_samples import IncrementalSampling
 from sampling.init_samples import InitSampling
@@ -12,11 +13,12 @@ from util.time_counter import TimeCounter, timeit
 def main():
     start_time = time.perf_counter()
 
-    Common().load_csv('SQL')
-    MLUtil.using_random_forest_max_val()
+    Common().load_csv('HSMGP_num')
+    MLUtil.using_cart()
+    DistanceUtil.f_get_distance = DistanceUtil.squared_sum
 
-    init_size = 10
-    total_size = 30
+    init_size = 15
+    total_size = 36
     f_init_sampling = InitSampling.fscs
     f_incremental_sampling = IncrementalSampling.max_acquisition_in_once
     
