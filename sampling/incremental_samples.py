@@ -91,3 +91,18 @@ class IncrementalSampling(object):
                 max_acq_val = acq_vals[i]
                 best = configs[i]
         return best
+    
+
+    @staticmethod
+    @timeit
+    def min_acquisition_in_once(already_sampled: list[Config]) -> Config:
+        pool = Common().configs_pool
+        configs = [config for config in pool if config not in already_sampled]
+        acq_vals = MLUtil.f_acquist_all(configs)
+        min_acq_val = float('inf')
+        best = None
+        for i in range(len(acq_vals)):
+            if acq_vals[i] < min_acq_val:
+                min_acq_val = acq_vals[i]
+                best = configs[i]
+        return best

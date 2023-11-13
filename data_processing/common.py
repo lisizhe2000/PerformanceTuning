@@ -107,6 +107,7 @@ class Common(object):
         self.sys_name = sys_name
         from util.config import Config
         self.configs_pool: list[Config] = []
+        self.all_performances = []
         csv_path = './Data/CsvMeasurements/' + sys_name + '.csv'
         df = pd.read_csv(csv_path)
         

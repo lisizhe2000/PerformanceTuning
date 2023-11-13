@@ -18,15 +18,15 @@ if __name__ == '__main__':
     # data
     rank_dict = {}
     
-    i29_t30_maxMean = (184, 203)
-    i15_t30_knnSub = (100, 119)
-    i10_t30_knnSub = (121, 140)
-    i15_t30_maxMean = (142, 161)
-    i10_t30_maxMean = (163, 182)
-    i15_t30_meanPredicted_randomForest = (226, 245)
-    i10_t30_meanPredicted_randomForest = (205, 224)
-    i15_t30_maxPredicted_randomForest = (247, 266)
-    i10_t30_maxPredicted_randomForest = (268, 287)
+    i29_t30_maxMean_SQL = (184, 203)
+    i15_t30_knnSub_SQL = (100, 119)
+    i10_t30_knnSub_SQL = (121, 140)
+    i15_t30_maxMean_SQL = (142, 161)
+    i10_t30_maxMean_SQL = (163, 182)
+    i15_t30_meanPredicted_randomForest_SQL = (226, 245)
+    i10_t30_meanPredicted_randomForest_SQL = (205, 224)
+    i15_t30_maxPredicted_randomForest_SQL = (247, 266)
+    i10_t30_maxPredicted_randomForest_SQL = (268, 287)
 
     # rank_dict['init_size=29\ntotal=30\nmax_mean\nCART'] = get_ranks(df, i29_t30_maxMean)
     # rank_dict['init_size=15\ntotal=30\nknn-sub'] = get_ranks(df, i15_t30_knnSub)
@@ -59,9 +59,22 @@ if __name__ == '__main__':
     # numeric
     flash_ranks_Dune = [3, 3, 5, 8, 82, 3, 3, 2, 3, 3, 20, 7, 3, 12, 5, 5, 1, 7, 21, 10]                            # mean_size = 39.65
     flash_ranks_HSMGP = [5, 58, 1, 0, 5, 0, 0, 0, 0, 5, 8, 0, 6, 0, 5, 0, 8, 0, 1, 5]                               # mean_size = 42.9
+
+    # 2023.11.9
+    i10_t36_maxPredicted_CART_lrzip = (448, 467)
+    i5_t36_maxPredicted_CART_lrzip = (468, 487)
+    i3_t36_maxPredicted_CART_lrzip = (488, 507)
+    i2_t36_maxPredicted_CART_lrzip = (508, 527)
+
+
     # plot dict
-    rank_dict['our'] = get_ranks(df, i15_t41_maxPredicted_CART_X264)
-    rank_dict['FLASH'] = flash_ranks_X264
+    # rank_dict['our'] = get_ranks(df, i15_t43_maxPredicted_CART_HSMGP)
+    rank_dict['i2'] = get_ranks(df, i2_t36_maxPredicted_CART_lrzip)
+    rank_dict['i3'] = get_ranks(df, i3_t36_maxPredicted_CART_lrzip)
+    rank_dict['i5'] = get_ranks(df, i5_t36_maxPredicted_CART_lrzip)
+    rank_dict['i10'] = get_ranks(df, i10_t36_maxPredicted_CART_lrzip)
+    rank_dict['i15'] = get_ranks(df, i15_t36_maxPredicted_CART_lrzip)
+    rank_dict['FLASH'] = flash_ranks_HSMGP
 
 
     plt.figure(figsize=(7, 7))

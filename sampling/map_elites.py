@@ -37,7 +37,7 @@ class MapElites(object):
         for i in range(iteration):
             if i % 20 == 0:
                 print('\tMAP-Elits: iteration {}......'.format(i))
-            self.evolve()
+            self.evolve_gen()
         return self.best_config
     
 
@@ -47,8 +47,15 @@ class MapElites(object):
             self.update_archive(config)
 
 
+    # get next from pool
+    def evolve_pool(self) -> None:
+        Common().configs_pool()
+        # TODO
+
+
     # 一次迭代
-    def evolve(self) -> None:
+    # generated way
+    def evolve_gen(self) -> None:
         indices = self.select()
         old = self.get_from_archive(indices)
         new = self.mutate(old)
