@@ -16,7 +16,7 @@ class Test():
         self.data = Common()
         # self.data.load_data('HSMGP', 'AverageTimePerIteration')
         # self.data.load_xml('Dune', 'Performance')
-        self.data.load_csv('Apache')
+        self.data.load_csv('SQL')
     
     def test_parse_dimacs(self):
         print('numOptions: ', self.data.num_options)
@@ -125,6 +125,10 @@ class Test():
     def test_fscs(self):
         samples = InitSampling.fscs(5)
         print([config.to_bin_str() for config in samples])
+
+    def test_get_rank(self):
+        rank = ExprUtil.get_performance_rank(13.0827868231411)
+        print(f'rank: {rank}')
         
 
 if __name__ == '__main__':
@@ -145,4 +149,5 @@ if __name__ == '__main__':
     # test.test_sail()
     # test.test_load_csv()
     # test.test_hamming_distance()
-    test.test_fscs()
+    # test.test_fscs()
+    test.test_get_rank()

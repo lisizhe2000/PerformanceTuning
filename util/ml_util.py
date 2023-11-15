@@ -35,7 +35,7 @@ class MLUtil(object):
 
         @timeit
         def train(configs: list[Config]) -> None:
-            X = MLUtil.__configs_to_nparray(configs)
+            X = MLUtil.configs_to_nparray(configs)
             y = np.array([config.get_real_performance() for config in configs])
             dtrain = xgb.DMatrix(X, label=y)
             num_round = 10
@@ -43,7 +43,7 @@ class MLUtil(object):
 
         MLUtil.f_train = train
         MLUtil.f_predict = lambda config: MLUtil.__model.predict(xgb.DMatrix(np.array([config.config_options])))[0]
-        MLUtil.f_precict_all = lambda configs: MLUtil.__model.predict(xgb.DMatrix(MLUtil.__configs_to_nparray(configs)))
+        MLUtil.f_precict_all = lambda configs: MLUtil.__model.predict(xgb.DMatrix(MLUtil.configs_to_nparray(configs)))
         MLUtil.f_acquisition = MLUtil.f_predict
         MLUtil.f_acquist_all = MLUtil.f_precict_all
         MLUtil.acquisition_function_name = 'predicted_val'
@@ -56,7 +56,7 @@ class MLUtil(object):
 
         MLUtil.f_train = MLUtil.__train_sklearn_model
         MLUtil.f_predict = lambda config: MLUtil.__model.predict(np.array([config.config_options]))
-        MLUtil.f_precict_all = lambda configs: MLUtil.__model.predict(MLUtil.__configs_to_nparray(configs))
+        MLUtil.f_precict_all = lambda configs: MLUtil.__model.predict(MLUtil.configs_to_nparray(configs))
         MLUtil.f_acquisition = MLUtil.f_predict
         MLUtil.f_acquist_all = MLUtil.f_precict_all
         MLUtil.acquisition_function_name = 'predicted_val'
@@ -69,7 +69,7 @@ class MLUtil(object):
 
         MLUtil.f_train = MLUtil.__train_sklearn_model
         MLUtil.f_predict = lambda config: MLUtil.__model.predict(np.array([config.config_options]))
-        MLUtil.f_precict_all = lambda configs: MLUtil.__model.predict(MLUtil.__configs_to_nparray(configs))
+        MLUtil.f_precict_all = lambda configs: MLUtil.__model.predict(MLUtil.configs_to_nparray(configs))
         MLUtil.f_acquisition = MLUtil.f_predict
         MLUtil.f_acquist_all = MLUtil.f_precict_all
         MLUtil.acquisition_function_name = 'mean_predicted_of_decision_trees'
@@ -92,7 +92,7 @@ class MLUtil(object):
             num_trees = len(MLUtil.__model.estimators_)
             predicted_mat = np.empty((num_trees, len(configs)), dtype=bool)     # TODO: 数据类型需要拓展到数值型
             for i in range(num_trees):
-                predicted_mat[i] = MLUtil.__model.estimators_[i].predict(MLUtil.__configs_to_nparray(configs))
+                predicted_mat[i] = MLUtil.__model.estimators_[i].predict(MLUtil.configs_to_nparray(configs))
             return predicted_mat.max(axis=0)
     
         MLUtil.f_acquisition = acquisition_function
@@ -102,12 +102,12 @@ class MLUtil(object):
 
     @timeit
     def __train_sklearn_model(configs: list[Config]) -> None:
-        X = MLUtil.__configs_to_nparray(configs)
+        X = MLUtil.configs_to_nparray(configs)
         y = np.array([config.get_real_performance() for config in configs])
         MLUtil.__model.fit(X, y)
 
 
     @staticmethod
-    def __configs_to_nparray(configs: list[Config]) -> np.ndarray:
+    def configs_to_nparray(configs: list[Config]) -> np.ndarray:
         return np.array([config.config_options for config in configs])
     

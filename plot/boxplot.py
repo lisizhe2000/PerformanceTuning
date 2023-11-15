@@ -4,7 +4,7 @@ import pandas as pd
 
 
 # inclusive
-def get_ranks(df: pd.DataFrame, data_range_in_csv: tuple[int]) -> list[int]:
+def get_ranks_from_results(df: pd.DataFrame, data_range_in_csv: tuple[int]) -> list[int]:
     ranks = []
     for i in range(data_range_in_csv[0] - 2, data_range_in_csv[1] - 1):
         rank = int(df.loc[i]['rank'])
@@ -69,11 +69,11 @@ if __name__ == '__main__':
 
     # plot dict
     # rank_dict['our'] = get_ranks(df, i15_t43_maxPredicted_CART_HSMGP)
-    rank_dict['i2'] = get_ranks(df, i2_t36_maxPredicted_CART_lrzip)
-    rank_dict['i3'] = get_ranks(df, i3_t36_maxPredicted_CART_lrzip)
-    rank_dict['i5'] = get_ranks(df, i5_t36_maxPredicted_CART_lrzip)
-    rank_dict['i10'] = get_ranks(df, i10_t36_maxPredicted_CART_lrzip)
-    rank_dict['i15'] = get_ranks(df, i15_t36_maxPredicted_CART_lrzip)
+    rank_dict['i2'] = get_ranks_from_results(df, i2_t36_maxPredicted_CART_lrzip)
+    rank_dict['i3'] = get_ranks_from_results(df, i3_t36_maxPredicted_CART_lrzip)
+    rank_dict['i5'] = get_ranks_from_results(df, i5_t36_maxPredicted_CART_lrzip)
+    rank_dict['i10'] = get_ranks_from_results(df, i10_t36_maxPredicted_CART_lrzip)
+    rank_dict['i15'] = get_ranks_from_results(df, i15_t36_maxPredicted_CART_lrzip)
     rank_dict['FLASH'] = flash_ranks_HSMGP
 
 

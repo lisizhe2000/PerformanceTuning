@@ -57,37 +57,19 @@ def main():
 if __name__ == '__main__':
     # main()
 
-    filename = 'SQL'
-    
-    ranks_flash = []
-    evals_flash = []
-    ranks_sail = []
-    evals_sail = []
-    
-    for _ in range(20):
-        rank, evals = ExprUtil.run_flash(filename)
-        ranks_flash.append(rank)
-        evals_flash.append(evals)
-        print(f'flash: rank={rank}, evals={evals}')
-        
-        # init_size = evals // 2
-        init_size = 15
-        rank, evals = ExprUtil.run_sail(
-            filename, 
-            MLUtil.using_cart, 
-            DistanceUtil.squared_sum,
-            init_size,
-            evals,
-            InitSampling.fscs,
-            IncrementalSampling.min_acquisition_in_once
-        )
-        ranks_sail.append(rank)
-        evals_sail.append(evals)
-        print(f'sail:  rank={rank}, evals={evals}')
-        
-    rank_dict = {}
-    rank_dict['sail'] = ranks_sail
-    rank_dict['flash'] = ranks_flash
-    ExprUtil.comparative_boxplot(rank_dict)
+    systems = [
+        # 'Apache',
+        # 'BDBC',
+        # 'Dune',
+        # 'HSMGP',
+        # 'lrzip',
+        'SQL',
+        # 'WGet',
+        # 'X264'
+    ]
+
+    for sys in systems:
+        print(f'------ {sys} ------')
+        ExprUtil.run_batch_comparative(sys, 20)
 
     print(TimeCounter.execution_time)
