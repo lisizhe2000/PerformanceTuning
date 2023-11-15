@@ -1,5 +1,6 @@
 import random
 from data_processing.common import Common
+from sampling.map_elites import MapElites
 from util.config import Config
 from util.distance_util import DistanceUtil
 from util.ml_util import MLUtil
@@ -106,3 +107,14 @@ class IncrementalSampling(object):
                 min_acq_val = acq_vals[i]
                 best = configs[i]
         return best
+    
+
+    @staticmethod
+    @timeit
+    def map_elites_num_selected(already_sampled: list[Config]) -> Config:
+        pool = Common().configs_pool
+        configs = [config for config in pool if config not in already_sampled]
+        map_elites = MapElites()
+        map_elites.batch_update_archive(configs)
+        return map_elites.sample_from_archive(best_n=3)
+

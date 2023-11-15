@@ -3,7 +3,7 @@ import numpy as np
 import xgboost as xgb
 from util.config import Config
 from data_processing.common import Common
-from map_elites import MapElites
+from sampling.map_elites import MapElites
 
 class Sail(object):
 

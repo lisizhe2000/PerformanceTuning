@@ -58,14 +58,14 @@ if __name__ == '__main__':
     # main()
 
     systems = [
-        # 'Apache',
-        # 'BDBC',
-        # 'Dune',
-        # 'HSMGP',
-        # 'lrzip',
+        'Apache',
+        'BDBC',
+        'Dune',
+        'HSMGP',
+        'lrzip',
         'SQL',
-        # 'WGet',
-        # 'X264'
+        'WGet',
+        'X264'
     ]
 
     for sys in systems:

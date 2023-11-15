@@ -65,10 +65,25 @@ class ExprUtil(object):
         # return (int(rank), int(evals))
         return (rank, int(evals))
     
+
+    @staticmethod
+    @timeit
+    def reproduce_flash(filename) -> (int, int):
+        rank, evals = ExprUtil.run(
+            filename,
+            MLUtil.using_cart,
+            None,
+            20,
+            50,
+            InitSampling.random,
+            IncrementalSampling.min_acquisition_in_once
+            )
+        return (rank, evals)
+    
     
     @staticmethod
     @timeit
-    def run_sail(
+    def run(
         filename: str, 
         f_ml_init: Callable[[], None], 
         f_distance: Callable[[Config, Config], int | float],
@@ -120,20 +135,21 @@ class ExprUtil(object):
 
             # init_size = evals // 2
             init_size = 20
-            rank, evals = ExprUtil.run_sail(
+            rank, evals = ExprUtil.run(
                 sys_name, 
                 MLUtil.using_cart, 
                 DistanceUtil.squared_sum,
                 init_size,
                 50,
                 InitSampling.random,
-                IncrementalSampling.min_acquisition_in_once
+                IncrementalSampling.map_elites_num_selected
             )
             ranks_sail.append(rank)
             evals_sail.append(evals)
             print(f'sail:  rank={rank}, evals={evals}')
 
-            rank, evals = ExprUtil.run_flash(sys_name)
+            # rank, evals = ExprUtil.run_flash(sys_name)
+            rank, evals = ExprUtil.reproduce_flash(sys_name)
             ranks_flash.append(rank)
             evals_flash.append(evals)
             print(f'flash: rank={rank}, evals={evals}')
