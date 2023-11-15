@@ -1,3 +1,4 @@
+import random
 import numpy as np
 from data_processing.common import Common
 from util.config import Config
@@ -40,4 +41,11 @@ class InitSampling(object):
                     furthest_distance = distance
             samples.append(furthest_config)
         return samples
-            
+
+    
+    @staticmethod
+    def random(size: int) -> None:
+        pool = Common().configs_pool
+        clone = [config for config in pool]
+        random.shuffle(clone)
+        return clone[:size]
