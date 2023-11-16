@@ -1,10 +1,12 @@
+import warnings
 import numpy as np
+from sklearn.cluster import KMeans
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.tree import DecisionTreeRegressor
 import xgboost as xgb
 
 from util.config import Config
-from typing import Callable
+from typing import Callable, Dict
 
 from util.time_counter import timeit
 
@@ -105,6 +107,21 @@ class MLUtil(object):
         X = MLUtil.configs_to_nparray(configs)
         y = np.array([config.get_real_performance() for config in configs])
         MLUtil.__model.fit(X, y)
+
+
+    kmeans_n_clusters = 8
+    config_clazz: Dict[Config, int] = None
+    @staticmethod
+    def get_kmeans_clazz(configs: list[Config]) -> Dict[Config, int]:
+        # if config_clazz is not None:
+            # return config_clazz
+        warnings.filterwarnings("ignore")
+        X = MLUtil.configs_to_nparray(configs)
+        kmeans = KMeans(n_clusters=MLUtil.kmeans_n_clusters).fit(X)
+        config_clazz = {}
+        for i in range(len(configs)):
+            config_clazz[configs[i]] = kmeans.labels_[i]
+        return config_clazz
 
 
     @staticmethod
