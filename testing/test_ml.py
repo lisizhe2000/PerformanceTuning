@@ -24,9 +24,23 @@ class TestML(object):
     def test_cart(self):
         model = DecisionTreeRegressor()
         model.fit(self.X, self.y)
-        prediction = model.predict([self.X[6]])
+        print(model.predict([self.X[6]]))
+        print(model.predict([self.X[6]]))
+        print(model.predict([self.X[6]]))
+        print(model.predict([self.X[6]]))
+        print(model.predict([self.X[6]]))
+        print(model.predict(self.X))
+        t = [False for _ in range(10)]
+        print(model.predict([t]))
+        print(model.predict([t]))
+        print(model.predict([t]))
+        print(model.predict([t]))
+        print(model.predict([t]))
+        print(model.predict([t,t,t,t,t]))
+
+
+        print(self.X)
         print(self.y)
-        print(prediction)
         
     def test_random_forest(self):
         model = RandomForestRegressor()
@@ -37,9 +51,3 @@ class TestML(object):
         mean = sum(vals) / len(vals)
         pred = model.predict(self.X)
         print(f'vals: {vals}\nmean: {mean}\npred: {pred}\nnum_trees: {len(model.estimators_)}\ncoefficient of decision: {model.score(self.X, self.y)}')
-
-if __name__ == '__main__':
-    test = TestML()
-    # test.test_xgboost()
-    # test.test_cart()
-    test.test_random_forest()
