@@ -1,4 +1,5 @@
 from functools import reduce
+from typing import Dict
 import numpy as np
 import xgboost as xgb
 from util.config import Config
@@ -15,8 +16,11 @@ class MapElites(object):
         self.to_minimize = to_minimize
 
         # features
-        num_selected = Feature(0, self.num_options + 1, self.num_options + 1, lambda configs: reduce(lambda x, y: x+y, configs.config_options))
-        self.features: list[Feature] = [num_selected]
+        # num_selected = Feature(0, self.num_options + 1, self.num_options + 1, lambda configs: reduce(lambda x, y: x+y, configs.config_options))
+        # self.features: list[Feature] = [num_selected]
+        self.config_clazz: Dict[Config, int] = MLUtil.get_kmeans_clazz(Common().configs_pool)
+        kmeans_clazz = Feature(0, MLUtil.kmeans_n_clusters, MLUtil.kmeans_n_clusters, lambda config: self.config_clazz[config])
+        self.features: list[Feature] = [kmeans_clazz]
 
         self.dimension = len(self.features)
         self.shape = (self.num_options + 1, )
@@ -82,7 +86,7 @@ class MapElites(object):
             if self.best_config == None or (val_acquisition < self.best_val_acq if self.to_minimize else val_acquisition > self.best_val_acq):
                 self.best_config = config  # update best
                 self.best_val_acq = MLUtil.f_acquisition(config)
-            print('\t\tBetter config found. old_val_acq: {}, new_val_acq: {}'.format(old_val_acq, val_acquisition))
+            # print('\t\tBetter config found. old_val_acq: {}, new_val_acq: {}'.format(old_val_acq, val_acquisition))
 
     
     def batch_update_archive(self, configs: list[Config]) -> None:
