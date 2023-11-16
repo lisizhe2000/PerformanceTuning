@@ -57,7 +57,7 @@ class MLUtil(object):
         MLUtil.model_name = 'CART'
 
         MLUtil.f_train = MLUtil.__train_sklearn_model
-        MLUtil.f_predict = lambda config: MLUtil.__model.predict(np.array([config.config_options]))
+        MLUtil.f_predict = lambda config: MLUtil.__model.predict(np.array([config.config_options]))[0]
         MLUtil.f_precict_all = lambda configs: MLUtil.__model.predict(MLUtil.configs_to_nparray(configs))
         MLUtil.f_acquisition = MLUtil.f_predict
         MLUtil.f_acquist_all = MLUtil.f_precict_all
@@ -70,7 +70,7 @@ class MLUtil(object):
         MLUtil.model_name = 'RandomForest'
 
         MLUtil.f_train = MLUtil.__train_sklearn_model
-        MLUtil.f_predict = lambda config: MLUtil.__model.predict(np.array([config.config_options]))
+        MLUtil.f_predict = lambda config: MLUtil.__model.predict(np.array([config.config_options]))[0]
         MLUtil.f_precict_all = lambda configs: MLUtil.__model.predict(MLUtil.configs_to_nparray(configs))
         MLUtil.f_acquisition = MLUtil.f_predict
         MLUtil.f_acquist_all = MLUtil.f_precict_all
