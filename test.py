@@ -1,6 +1,7 @@
 from functools import reduce
 
 import xgboost as xgb
+from testing.test_ml import TestML
 from util.config import Config
 from data_processing.common import Common
 from util.distance_util import DistanceUtil
@@ -150,4 +151,8 @@ if __name__ == '__main__':
     # test.test_load_csv()
     # test.test_hamming_distance()
     # test.test_fscs()
-    test.test_get_rank()
+    # test.test_get_rank()
+
+
+    test_ml = TestML()
+    test_ml.test_cart()    

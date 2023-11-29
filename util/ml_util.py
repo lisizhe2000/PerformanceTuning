@@ -1,3 +1,4 @@
+from multiprocessing import Pool
 import warnings
 import numpy as np
 from sklearn.cluster import KMeans
@@ -23,6 +24,10 @@ class MLUtil(object):
     f_acquisition: Callable[[Config], float] = None
     f_acquist_all: Callable[[list[Config]], np.ndarray] = None
     acquisition_function_name = None
+
+    # multi model
+    __n_carts = 4
+    __alpha = 2.
 
 
     @staticmethod
@@ -66,7 +71,7 @@ class MLUtil(object):
 
     @staticmethod
     def using_random_forest() -> None:
-        MLUtil.__model = RandomForestRegressor()
+        MLUtil.__model = RandomForestRegressor(n_estimators=MLUtil.__n_carts)
         MLUtil.model_name = 'RandomForest'
 
         MLUtil.f_train = MLUtil.__train_sklearn_model
@@ -83,8 +88,14 @@ class MLUtil(object):
 
         def acquisition_function(config: Config) -> float:
             max_val = float('-inf')
+            pool = Pool()
+            res = []
             for dt in MLUtil.__model.estimators_:
-                predicted_val = dt.predict(np.array(config.config_options))
+                res.append(pool.apply_async(dt.predict, [np.array(config.config_options)]))
+            pool.close()
+            pool.join()
+            for predicted_val in res:
+                predicted_val = predicted_val.get()
                 if predicted_val > max_val:
                     max_val = predicted_val
             return max_val
@@ -92,14 +103,72 @@ class MLUtil(object):
         # 速度要慢几十倍，效果也差不多
         def acquist_all(configs: list[Config]) -> np.ndarray:
             num_trees = len(MLUtil.__model.estimators_)
-            predicted_mat = np.empty((num_trees, len(configs)), dtype=bool)     # TODO: 数据类型需要拓展到数值型
+            predicted_mat = np.empty((num_trees, len(configs)))
+            pool = Pool()
+            res = []
             for i in range(num_trees):
-                predicted_mat[i] = MLUtil.__model.estimators_[i].predict(MLUtil.configs_to_nparray(configs))
+                res.append(pool.apply_async(MLUtil.__model.estimators_[i].predict, [MLUtil.configs_to_nparray(configs)]))
+            pool.close()
+            pool.join()
+            for i in range(num_trees):
+                predicted_mat[i] = res[i].get()
             return predicted_mat.max(axis=0)
     
         MLUtil.f_acquisition = acquisition_function
         MLUtil.f_acquist_all = acquist_all    
         MLUtil.acquisition_function_name = 'max_predicted_of_decision_trees'
+
+
+    @staticmethod
+    def using_random_forest_ucb() -> None:
+        MLUtil.using_random_forest()
+
+        def acquist_all(configs: list[Config]) -> np.ndarray:
+            predicted_mat = np.empty((MLUtil.__n_carts, len(configs)))
+            for i in range(MLUtil.__n_carts):
+                predicted_mat[i] = MLUtil.__model.estimators_[i].predict(MLUtil.configs_to_nparray(configs))
+            return predicted_mat.mean(axis=0) + MLUtil.__alpha * predicted_mat.std(axis=0)
+        
+        MLUtil.f_acquist_all = acquist_all
+        MLUtil.acquisition_function_name = 'random_forest_UCB'
+
+
+    @staticmethod
+    # FIXME: NotFittedError
+    def using_n_carts_ucb() -> None:
+        MLUtil.model: list[DecisionTreeRegressor] = [DecisionTreeRegressor() for _ in range(MLUtil.__n_carts)]
+        MLUtil.model_name = 'n_carts_ucb'
+
+        def train(configs: list[Config]) -> None:
+            X = MLUtil.configs_to_nparray(configs)
+            y = np.array([config.get_real_performance() for config in configs])
+            # pool = Pool()
+            # for i in range(n_carts):
+            #     pool.apply_async(MLUtil.model[i].fit, [X, y])
+            # pool.close()
+            # pool.join()
+            for dt in MLUtil.model:
+                dt.fit(X, y)
+            
+
+        def acquist_all(configs: list[Config]) -> np.ndarray:
+            predicted_mat = np.empty((MLUtil.__n_carts, len(configs)))
+            # pool = Pool()
+            # res = []
+            # for i in range(n_carts):
+            #     res.append(pool.apply_async(MLUtil.model[i].predict, [MLUtil.configs_to_nparray(configs)]))
+            # pool.close()
+            # pool.join()
+            # for i in range(n_carts):
+            #     predicted_mat[i] = res[i].get()
+            for i in range(MLUtil.__n_carts):
+                predicted_mat[i] = MLUtil.model[i].predict(MLUtil.configs_to_nparray(configs))
+            # print(f'mean: {predicted_mat.mean(axis=0)}, std: {predicted_mat.std(axis=0)}')
+            return predicted_mat.mean(axis=0) + MLUtil.__alpha * predicted_mat.std(axis=0)
+        
+        MLUtil.f_train = train
+        MLUtil.f_acquist_all = acquist_all
+        MLUtil.acquisition_function_name = 'n_carts_UCB'
 
 
     @timeit
