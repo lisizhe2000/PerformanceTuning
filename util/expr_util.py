@@ -68,13 +68,12 @@ class ExprUtil(object):
 
     @staticmethod
     @timeit
-    def reproduce_flash(filename) -> (int, int):
+    def reproduce_flash(init_size, total_size) -> (int, int):
         rank, evals = ExprUtil.run(
-            filename,
             MLUtil.using_cart,
             None,
-            20,
-            50,
+            init_size,
+            total_size,
             InitSampling.random,
             IncrementalSampling.min_acquisition_in_once
             )
@@ -84,7 +83,6 @@ class ExprUtil(object):
     @staticmethod
     @timeit
     def run(
-        filename: str, 
         f_ml_init: Callable[[], None], 
         f_distance: Callable[[Config, Config], int | float],
         init_size: int,
@@ -95,7 +93,6 @@ class ExprUtil(object):
 
         print('!... new run ...!')
 
-        Common().load_csv(filename)
         f_ml_init()
         DistanceUtil.f_get_distance = f_distance
         
@@ -108,8 +105,8 @@ class ExprUtil(object):
             else:
                 samples.append(new)
 
-            rank = ExprUtil.get_rank(new)
-            ExprUtil.print_indicators(rank=rank)
+            # rank = ExprUtil.get_rank(new)
+            # ExprUtil.print_indicators(rank=rank)
 
         best = min(samples, key = lambda config: config.get_real_performance())
         rank = ExprUtil.get_rank(best, to_minimize=True)
@@ -136,25 +133,26 @@ class ExprUtil(object):
         ranks_sail = []
         evals_sail = []
         
+        Common().load_csv(sys_name)
         for _ in range(repeats):
 
             # init_size = evals // 2
             init_size = 20
+            total_size = 50
             rank, evals = ExprUtil.run(
-                sys_name, 
-                MLUtil.using_cart, 
+                MLUtil.using_cart,
                 DistanceUtil.squared_sum,
                 init_size,
-                50,
+                total_size,
                 InitSampling.random,
-                IncrementalSampling.map_elites_num_selected
+                IncrementalSampling.map_elites
             )
             ranks_sail.append(rank)
             evals_sail.append(evals)
             print(f'sail:  rank={rank}, evals={evals}')
 
             # rank, evals = ExprUtil.run_flash(sys_name)
-            rank, evals = ExprUtil.reproduce_flash(sys_name)
+            rank, evals = ExprUtil.reproduce_flash(init_size, total_size)
             ranks_flash.append(rank)
             evals_flash.append(evals)
             print(f'flash: rank={rank}, evals={evals}')
@@ -183,7 +181,6 @@ class ExprUtil(object):
             f'n_pred_better_than_best: {n_pred_better_than_best}, '
             )
 
-        
     
     @staticmethod
     def eval_errror_rate(predicted_performances: list[float]) -> float:

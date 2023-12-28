@@ -58,14 +58,20 @@ if __name__ == '__main__':
     # main()
 
     systems = [
-        'Apache',
-        'BDBC',
-        'Dune',
-        'HSMGP',
-        'lrzip',
-        'SQL',
-        'WGet',
-        'X264'
+        # 'Apache',
+        # 'BDBC',
+        # 'Dune',
+        # 'HSMGP',
+        # 'lrzip',
+        # 'SQL',
+        # 'WGet',
+        # 'X264',
+        # 'JavaGC',
+        # 'JavaGC_num',
+        'sac_compile-cpu',
+        'sac_compile-maxmem',
+        'sac_run-cpu',
+        'sac_run-maxmem'
     ]
 
     for sys in systems:

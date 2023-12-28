@@ -1,3 +1,5 @@
+import csv
+import math
 import re
 import xml.etree.ElementTree as ET
 import pandas as pd
@@ -103,21 +105,46 @@ class Common(object):
         self.sat_config_iter = self.solver.enum_models()
 
     
-    def load_csv(self, sys_name: str) -> None:
+    def load_csv(self, sys_name: str, chunk_reading=False) -> None:
         self.sys_name = sys_name
+        print(f'Loading {sys_name}...')
         from util.config import Config
         self.configs_pool: list[Config] = []
         self.all_performances = []
         csv_path = './Data/CsvMeasurements/' + sys_name + '.csv'
-        df = pd.read_csv(csv_path)
-        
-        self.num_options = len(df.columns) - 1
+        if chunk_reading:
+            chunksize = 10 ** 3
+            for i, chunk in enumerate(pd.read_csv(csv_path, chunksize=chunksize)):
+                self.num_options = len(chunk.columns) - 1
+                print(f'Loading chunk {i}...')
+                for i, row in chunk.iterrows():
+                    row = row.tolist()
+                    config_options = row[:-1]
+                    performance = row[-1]
+                    config = Config(config_options, performance=performance)
+                    self.all_performances.append(performance)
+                    self.configs_pool.append(config)
+                    if math.isnan(performance):
+                        print('performance nan')
+                        print(f'row: {row}')
+                        print(f'config_options: {config_options}')
+                        break
+                else:
+                    continue
+                break
+            print('Loading finished.')
+        else:
+            df = pd.read_csv(csv_path)
+            print('Loading finished.')
+            
+            self.num_options = len(df.columns) - 1
 
-        for _, row in df.iterrows():
-            row = row.tolist()
-            # config_options = [True if option == 1 else False for option in row[:-1]]
-            config_options = row[:-1]
-            performance = row[-1]
-            config = Config(config_options, performance=performance)
-            self.all_performances.append(performance)
-            self.configs_pool.append(config)
+            for _, row in df.iterrows():
+                row = row.tolist()
+                # config_options = [True if option == 1 else False for option in row[:-1]]
+                config_options = row[:-1]
+                performance = row[-1]
+                config = Config(config_options, performance=performance)
+                self.all_performances.append(performance)
+                self.configs_pool.append(config)
+                

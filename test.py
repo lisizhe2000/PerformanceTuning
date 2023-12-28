@@ -17,7 +17,7 @@ class Test():
         self.data = Common()
         # self.data.load_data('HSMGP', 'AverageTimePerIteration')
         # self.data.load_xml('Dune', 'Performance')
-        self.data.load_csv('SQL')
+        self.data.load_csv('JavaGC_num', chunk_reading=True)
     
     def test_parse_dimacs(self):
         print('numOptions: ', self.data.num_options)
@@ -131,6 +131,11 @@ class Test():
         rank = ExprUtil.get_performance_rank(13.0827868231411)
         print(f'rank: {rank}')
         
+    def test_read_csv(self):
+        print(f'len configs pool: {len(Common().configs_pool)}')
+        print([config.to_bin_str() for config in Common().configs_pool[-10:]])
+        print([config.get_real_performance() for config in Common().configs_pool[-10:]])
+        
 
 if __name__ == '__main__':
     test = Test()
@@ -152,7 +157,8 @@ if __name__ == '__main__':
     # test.test_hamming_distance()
     # test.test_fscs()
     # test.test_get_rank()
+    # test.test_read_csv()
 
 
-    test_ml = TestML()
-    test_ml.test_cart()    
+    # test_ml = TestML()
+    # test_ml.test_cart()    

@@ -111,7 +111,7 @@ class IncrementalSampling(object):
 
     @staticmethod
     @timeit
-    def map_elites_num_selected(already_sampled: list[Config]) -> Config:
+    def map_elites(already_sampled: list[Config]) -> Config:
         pool = Common().configs_pool
         configs = [config for config in pool if config not in already_sampled]
         map_elites = MapElites()
