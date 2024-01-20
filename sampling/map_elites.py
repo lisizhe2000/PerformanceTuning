@@ -85,7 +85,7 @@ class MapElites(object):
             tmp[last_idx] = (config, val_acquisition)  # update archive
             if self.best_config == None or (val_acquisition < self.best_val_acq if self.to_minimize else val_acquisition > self.best_val_acq):
                 self.best_config = config  # update best
-                self.best_val_acq = MLUtil.f_acquisition(config)
+                self.best_val_acq = val_acquisition
             # print('\t\tBetter config found. old_val_acq: {}, new_val_acq: {}'.format(old_val_acq, val_acquisition))
 
     
