@@ -4,9 +4,15 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import time
 from typing import Callable, Iterable
 
 from matplotlib import pyplot as plt
+from sklearn.ensemble import AdaBoostRegressor, RandomForestRegressor
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.svm import SVR
+from sklearn.tree import DecisionTreeRegressor
 from data_processing.common import Common
 from sampling.incremental_samples import IncrementalSampling
 from sampling.init_samples import InitSampling
@@ -88,12 +94,16 @@ class ExprUtil(object):
         init_size: int,
         total_size: int,
         f_init_sampling: Callable[[int], list[Config]],
-        f_incremental_sampling: Callable[[list[Config]], Config]
+        f_incremental_sampling: Callable[[list[Config]], Config],
+        ml_model=None,
         ) -> (int, int):
 
-        print('!... new run ...!')
+        # print('!... new run ...!')
 
-        f_ml_init()
+        if ml_model is not None:
+            f_ml_init(ml_model)
+        else:
+            f_ml_init()
         DistanceUtil.f_get_distance = f_distance
         
         samples = f_init_sampling(init_size)
@@ -110,14 +120,14 @@ class ExprUtil(object):
 
         best = min(samples, key = lambda config: config.get_real_performance())
         rank = ExprUtil.get_rank(best, to_minimize=True)
-        print(f'best performance: {best.get_real_performance()}')
+        # print(f'best performance: {best.get_real_performance()}')
         
         return (rank, total_size)
 
 
     @staticmethod
-    def comparative_boxplot(rank_dict: dict) -> None:
-        plt.figure(figsize=(7,7))
+    def comparative_boxplot(rank_dict: dict, fig_size=(7,7)) -> None:
+        plt.figure(figsize=fig_size)
         plt.boxplot(rank_dict.values(), labels=rank_dict.keys(), showmeans=True)
         # plt.show()
         path = f'./Data/plot/{datetime.today().strftime("%Y%m%d")}'
@@ -161,6 +171,44 @@ class ExprUtil(object):
         rank_dict['sail'] = ranks_sail
         rank_dict['flash'] = ranks_flash
         ExprUtil.comparative_boxplot(rank_dict)
+        
+        
+    @staticmethod
+    def run_different_models(sys_name: str, repeats: int) -> None:
+        models = [
+            LinearRegression(), 
+            SVR(),
+            KNeighborsRegressor(),
+            # LogisticRegression(),     # 逻辑回归是分类模型
+            DecisionTreeRegressor(),
+            # RandomForestRegressor(),
+            # GaussianNB(),   # 可以用partial_fit做增量学习
+            # AdaBoostRegressor(),
+            ]
+        Common().load_csv(sys_name)
+        init_size = 20
+        total_size = 50
+        rank_dict = {}
+        
+        for model in models:
+            start_time = time.perf_counter()
+            ranks = []
+            for _ in range(repeats):
+                rank, evals = ExprUtil.run(
+                    MLUtil.using_sklearn_model,
+                    DistanceUtil.squared_sum,
+                    init_size,
+                    total_size,
+                    InitSampling.random,
+                    IncrementalSampling.min_acquisition_in_once,
+                    ml_model=model
+                )
+                ranks.append(rank)
+            elapse = time.perf_counter() - start_time
+            rank_dict[MLUtil.model_name] = ranks
+            print(f'{MLUtil.model_name}: mean_rank={sum(ranks) / len(ranks)}, evals={evals}, elapse={elapse:.3f}s')
+        
+        ExprUtil.comparative_boxplot(rank_dict, fig_size=(12,7))
 
 
     @staticmethod

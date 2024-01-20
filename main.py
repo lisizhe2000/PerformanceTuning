@@ -66,16 +66,49 @@ if __name__ == '__main__':
         # 'SQL',
         # 'WGet',
         # 'X264',
-        # 'JavaGC',
-        # 'JavaGC_num',
+
+        # 'SS-A1',
+        # 'SS-A2',
+        # 'SS-B1',
+        # 'SS-B2',
+        # 'SS-C1',
+        # 'SS-C2',
+        # 'SS-D1',
+        # 'SS-D2',
+        # 'SS-E1',
+        # 'SS-E2',
+        # 'SS-F1',
+        # 'SS-F2',
+        # 'SS-G1',
+        # 'SS-G2',
+        # 'SS-H1',
+        # 'SS-H2',
+        # 'SS-I1',
+        # 'SS-I2',
+        # 'SS-J1',
+        # 'SS-J2',
+        # 'SS-K1',
+        # 'SS-K2',
+        # 'SS-L1',
+        # 'SS-L2',
+        
+        'SS-M1',
+        'SS-M2',
+        'SS-N1',
+        'SS-N2',
+        'SS-O1',
+        'SS-O2',
+        #        # 'JavaGC',
+        'JavaGC_num',
         'sac_compile-cpu',
         'sac_compile-maxmem',
         'sac_run-cpu',
-        'sac_run-maxmem'
+        'sac_run-maxmem',
     ]
 
     for sys in systems:
         print(f'------ {sys} ------')
-        ExprUtil.run_batch_comparative(sys, 20)
+        # ExprUtil.run_batch_comparative(sys, 20)
+        ExprUtil.run_different_models(sys, 10)
 
     print(TimeCounter.execution_time)

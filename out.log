@@ -1,0 +1,232 @@
+两百次运行均值:
+------ Apache ------
+Loading Apache...
+Loading finished.
+LinearRegression: mean_rank=0.12, evals=50, elapse=5.813s
+SVR: mean_rank=0.0, evals=50, elapse=6.562s
+KNeighborsRegressor: mean_rank=0.29, evals=50, elapse=5.795s
+DecisionTreeRegressor: mean_rank=0.04, evals=50, elapse=3.798s
+------ BDBC ------
+Loading BDBC...
+Loading finished.
+LinearRegression: mean_rank=33.845, evals=50, elapse=26.686s
+SVR: mean_rank=66.805, evals=50, elapse=42.253s
+KNeighborsRegressor: mean_rank=60.335, evals=50, elapse=35.894s
+DecisionTreeRegressor: mean_rank=43.495, evals=50, elapse=23.108s
+------ Dune ------
+Loading Dune...
+Loading finished.
+LinearRegression: mean_rank=6.78, evals=50, elapse=21.894s
+SVR: mean_rank=24.98, evals=50, elapse=39.196s
+KNeighborsRegressor: mean_rank=22.47, evals=50, elapse=29.059s
+DecisionTreeRegressor: mean_rank=5.69, evals=50, elapse=17.594s
+------ HSMGP ------
+Loading HSMGP...
+Loading finished.
+LinearRegression: mean_rank=2.52, evals=50, elapse=35.853s
+SVR: mean_rank=18.63, evals=50, elapse=59.491s
+KNeighborsRegressor: mean_rank=3.57, evals=50, elapse=45.930s
+DecisionTreeRegressor: mean_rank=2.14, evals=50, elapse=27.051s
+------ lrzip ------
+Loading lrzip...
+Loading finished.
+LinearRegression: mean_rank=4.24, evals=50, elapse=12.672s
+SVR: mean_rank=6.545, evals=50, elapse=11.547s
+KNeighborsRegressor: mean_rank=0.71, evals=50, elapse=24.743s
+DecisionTreeRegressor: mean_rank=0.545, evals=50, elapse=6.550s
+------ SQL ------
+Loading SQL...
+Loading finished.
+LinearRegression: mean_rank=74.78, evals=50, elapse=95.295s
+SVR: mean_rank=72.875, evals=50, elapse=109.334s
+KNeighborsRegressor: mean_rank=98.26, evals=50, elapse=135.109s
+DecisionTreeRegressor: mean_rank=132.29, evals=50, elapse=63.524s
+------ WGet ------
+Loading WGet...
+Loading finished.
+LinearRegression: mean_rank=1.745, evals=50, elapse=8.558s
+SVR: mean_rank=3.115, evals=50, elapse=6.818s
+KNeighborsRegressor: mean_rank=3.025, evals=50, elapse=19.765s
+DecisionTreeRegressor: mean_rank=1.595, evals=50, elapse=4.312s
+------ X264 ------
+Loading X264...
+Loading finished.
+LinearRegression: mean_rank=1.535, evals=50, elapse=21.516s
+SVR: mean_rank=18.605, evals=50, elapse=22.617s
+KNeighborsRegressor: mean_rank=1.515, evals=50, elapse=29.652s
+DecisionTreeRegressor: mean_rank=0.04, evals=50, elapse=11.634s
+{'__train_sklearn_model': 103.44871631078422, 'min_acquisition_in_once': 898.6905306493572, 'run': 1009.5831244836736}
+
+------ SS-A1 ------
+Loading SS-A1...
+Loading finished.
+LinearRegression: mean_rank=6.505, evals=50, elapse=8.992s
+SVR: mean_rank=27.805, evals=50, elapse=21.458s
+KNeighborsRegressor: mean_rank=21.09, evals=50, elapse=12.879s
+DecisionTreeRegressor: mean_rank=3.82, evals=50, elapse=8.438s
+------ SS-A2 ------
+Loading SS-A2...
+Loading finished.
+LinearRegression: mean_rank=3.905, evals=50, elapse=9.069s
+SVR: mean_rank=27.77, evals=50, elapse=21.509s
+KNeighborsRegressor: mean_rank=10.36, evals=50, elapse=13.283s
+DecisionTreeRegressor: mean_rank=11.085, evals=50, elapse=8.584s
+------ SS-B1 ------
+Loading SS-B1...
+Loading finished.
+LinearRegression: mean_rank=0.0, evals=50, elapse=4.025s
+SVR: mean_rank=1.505, evals=50, elapse=6.262s
+KNeighborsRegressor: mean_rank=1.615, evals=50, elapse=5.570s
+DecisionTreeRegressor: mean_rank=0.035, evals=50, elapse=3.528s
+------ SS-B2 ------
+Loading SS-B2...
+Loading finished.
+LinearRegression: mean_rank=0.0, evals=50, elapse=4.063s
+SVR: mean_rank=0.0, evals=50, elapse=6.321s
+KNeighborsRegressor: mean_rank=0.205, evals=50, elapse=5.513s
+DecisionTreeRegressor: mean_rank=0.0, evals=50, elapse=3.581s
+------ SS-C1 ------
+Loading SS-C1...
+Loading finished.
+LinearRegression: mean_rank=1.885, evals=50, elapse=9.829s
+SVR: mean_rank=27.745, evals=50, elapse=23.885s
+KNeighborsRegressor: mean_rank=3.015, evals=50, elapse=14.058s
+DecisionTreeRegressor: mean_rank=1.11, evals=50, elapse=9.270s
+------ SS-C2 ------
+Loading SS-C2...
+Loading finished.
+LinearRegression: mean_rank=6.84, evals=50, elapse=9.871s
+SVR: mean_rank=25.36, evals=50, elapse=23.891s
+KNeighborsRegressor: mean_rank=9.865, evals=50, elapse=14.427s
+DecisionTreeRegressor: mean_rank=8.345, evals=50, elapse=9.395s
+------ SS-D1 ------
+Loading SS-D1...
+Loading finished.
+LinearRegression: mean_rank=3.0, evals=50, elapse=4.037s
+SVR: mean_rank=1.11, evals=50, elapse=6.302s
+KNeighborsRegressor: mean_rank=0.0, evals=50, elapse=5.431s
+DecisionTreeRegressor: mean_rank=0.12, evals=50, elapse=3.520s
+------ SS-D2 ------
+Loading SS-D2...
+Loading finished.
+LinearRegression: mean_rank=0.23, evals=50, elapse=4.126s
+SVR: mean_rank=0.225, evals=50, elapse=6.273s
+KNeighborsRegressor: mean_rank=3.96, evals=50, elapse=5.518s
+DecisionTreeRegressor: mean_rank=0.53, evals=50, elapse=3.704s
+------ SS-E1 ------
+Loading SS-E1...
+Loading finished.
+LinearRegression: mean_rank=28.84, evals=50, elapse=6.624s
+SVR: mean_rank=14.77, evals=50, elapse=13.823s
+KNeighborsRegressor: mean_rank=0.66, evals=50, elapse=9.143s
+DecisionTreeRegressor: mean_rank=0.02, evals=50, elapse=6.072s
+------ SS-E2 ------
+Loading SS-E2...
+Loading finished.
+LinearRegression: mean_rank=8.155, evals=50, elapse=6.678s
+SVR: mean_rank=6.865, evals=50, elapse=13.471s
+KNeighborsRegressor: mean_rank=0.17, evals=50, elapse=9.188s
+DecisionTreeRegressor: mean_rank=0.365, evals=50, elapse=6.147s
+------ SS-F1 ------
+Loading SS-F1...
+Loading finished.
+LinearRegression: mean_rank=3.695, evals=50, elapse=4.061s
+SVR: mean_rank=2.45, evals=50, elapse=6.292s
+KNeighborsRegressor: mean_rank=0.0, evals=50, elapse=5.462s
+DecisionTreeRegressor: mean_rank=0.195, evals=50, elapse=3.549s
+------ SS-F2 ------
+Loading SS-F2...
+Loading finished.
+LinearRegression: mean_rank=2.495, evals=50, elapse=4.062s
+SVR: mean_rank=0.0, evals=50, elapse=6.159s
+KNeighborsRegressor: mean_rank=0.0, evals=50, elapse=5.428s
+DecisionTreeRegressor: mean_rank=0.07, evals=50, elapse=3.547s
+------ SS-G1 ------
+Loading SS-G1...
+Loading finished.
+LinearRegression: mean_rank=2.49, evals=50, elapse=4.062s
+SVR: mean_rank=0.87, evals=50, elapse=6.309s
+KNeighborsRegressor: mean_rank=0.0, evals=50, elapse=5.449s
+DecisionTreeRegressor: mean_rank=0.07, evals=50, elapse=3.549s
+------ SS-G2 ------
+Loading SS-G2...
+Loading finished.
+LinearRegression: mean_rank=1.235, evals=50, elapse=4.072s
+SVR: mean_rank=0.0, evals=50, elapse=6.177s
+KNeighborsRegressor: mean_rank=0.0, evals=50, elapse=5.577s
+DecisionTreeRegressor: mean_rank=0.095, evals=50, elapse=3.587s
+------ SS-H1 ------
+Loading SS-H1...
+Loading finished.
+LinearRegression: mean_rank=0.0, evals=50, elapse=4.469s
+SVR: mean_rank=0.0, evals=50, elapse=6.752s
+KNeighborsRegressor: mean_rank=0.0, evals=50, elapse=6.124s
+DecisionTreeRegressor: mean_rank=0.0, evals=50, elapse=3.927s
+------ SS-H2 ------
+Loading SS-H2...
+Loading finished.
+LinearRegression: mean_rank=0.31, evals=50, elapse=4.474s
+SVR: mean_rank=0.0, evals=50, elapse=6.104s
+KNeighborsRegressor: mean_rank=0.0, evals=50, elapse=6.120s
+DecisionTreeRegressor: mean_rank=0.0, evals=50, elapse=3.939s
+------ SS-I1 ------
+Loading SS-I1...
+Loading finished.
+LinearRegression: mean_rank=5.595, evals=50, elapse=8.731s
+SVR: mean_rank=13.18, evals=50, elapse=18.579s
+KNeighborsRegressor: mean_rank=9.19, evals=50, elapse=12.424s
+DecisionTreeRegressor: mean_rank=4.375, evals=50, elapse=8.196s
+------ SS-I2 ------
+Loading SS-I2...
+Loading finished.
+LinearRegression: mean_rank=3.975, evals=50, elapse=8.852s
+SVR: mean_rank=9.6, evals=50, elapse=19.208s
+KNeighborsRegressor: mean_rank=7.08, evals=50, elapse=12.450s
+DecisionTreeRegressor: mean_rank=0.73, evals=50, elapse=8.255s
+------ SS-J1 ------
+Loading SS-J1...
+Loading finished.
+LinearRegression: mean_rank=61.215, evals=50, elapse=23.383s
+SVR: mean_rank=96.02, evals=50, elapse=56.386s
+KNeighborsRegressor: mean_rank=45.645, evals=50, elapse=34.249s
+DecisionTreeRegressor: mean_rank=26.55, evals=50, elapse=22.268s
+------ SS-J2 ------
+Loading SS-J2...
+Loading finished.
+LinearRegression: mean_rank=93.095, evals=50, elapse=23.818s
+SVR: mean_rank=41.835, evals=50, elapse=56.800s
+KNeighborsRegressor: mean_rank=40.88, evals=50, elapse=34.739s
+DecisionTreeRegressor: mean_rank=7.825, evals=50, elapse=22.795s
+------ SS-K1 ------
+Loading SS-K1...
+Loading finished.
+LinearRegression: mean_rank=49.505, evals=50, elapse=18.917s
+SVR: mean_rank=68.245, evals=50, elapse=43.746s
+KNeighborsRegressor: mean_rank=7.295, evals=50, elapse=27.324s
+DecisionTreeRegressor: mean_rank=2.42, evals=50, elapse=18.113s
+/home/sizhe/code/SailHCS/util/expr_util.py:130: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`). Consider using `matplotlib.pyplot.close()`.
+  plt.figure(figsize=fig_size)
+------ SS-K2 ------
+Loading SS-K2...
+Loading finished.
+LinearRegression: mean_rank=26.335, evals=50, elapse=18.910s
+SVR: mean_rank=15.165, evals=50, elapse=43.218s
+KNeighborsRegressor: mean_rank=1.94, evals=50, elapse=27.591s
+DecisionTreeRegressor: mean_rank=2.845, evals=50, elapse=18.206s
+------ SS-L1 ------
+Loading SS-L1...
+Loading finished.
+LinearRegression: mean_rank=0.195, evals=50, elapse=18.223s
+SVR: mean_rank=4.47, evals=50, elapse=20.000s
+KNeighborsRegressor: mean_rank=0.75, evals=50, elapse=15.245s
+DecisionTreeRegressor: mean_rank=2.52, evals=50, elapse=9.649s
+------ SS-L2 ------
+Loading SS-L2...
+Loading finished.
+LinearRegression: mean_rank=3.04, evals=50, elapse=18.518s
+SVR: mean_rank=13.61, evals=50, elapse=19.748s
+KNeighborsRegressor: mean_rank=3.57, evals=50, elapse=15.519s
+DecisionTreeRegressor: mean_rank=20.01, evals=50, elapse=9.929s
+
+DecisionTreeRegressor有16个数据集的平均排名最低，KNeighborsRegressor有14个数据集的平均排名最低，SVR有13个数据集的平均排名最低，LinearRegression有7个数据集的平均排名最低。
+共32个数据集
