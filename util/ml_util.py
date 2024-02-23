@@ -11,11 +11,12 @@ import xgboost as xgb
 
 from util.config import Config
 from typing import Callable, Dict
+from util.multi_armed_bandit import EpsilonGreedy
 
 from util.time_counter import timeit
 
 
-# Meachine Learning Util
+# Machine Learning Util
 class MLUtil(object):
 
 
@@ -82,6 +83,15 @@ class MLUtil(object):
         MLUtil.f_precict_all = lambda configs: MLUtil.__model.predict(MLUtil.configs_to_nparray(configs))
         MLUtil.f_acquisition = MLUtil.f_predict
         MLUtil.f_acquist_all = MLUtil.f_precict_all
+        MLUtil.acquisition_function_name = 'predicted_val'
+
+
+    @staticmethod
+    def using_epsilon_greedy() -> None:
+        MLUtil.__bandit = EpsilonGreedy()
+        MLUtil.model_name = 'epsilon_greedy'
+        MLUtil.f_train = MLUtil.__bandit.train
+        MLUtil.f_acquist_all = MLUtil.__bandit.acquist_all
         MLUtil.acquisition_function_name = 'predicted_val'
 
 
