@@ -46,28 +46,24 @@ class ExprRunningUtil(object):
 
     @staticmethod
     @timeit
-    def reproduce_flash(init_size, total_size) -> (int, int):
-        rank, evals = ExprRunningUtil.run(
+    def reproduce_flash() -> int:
+        rank = ExprRunningUtil.run(
             MLUtil.using_cart,
             None,
-            init_size,
-            total_size,
             InitSampling.random,
             IncrementalSampling.min_acquisition_in_once
             )
-        return (rank, evals)
+        return rank
 
     @staticmethod
     @timeit
     def run(
         f_ml_init: Callable[[], None], 
         f_distance: Callable[[Config, Config], int | float],
-        init_size: int,
-        total_size: int,
         f_init_sampling: Callable[[int], list[Config]],
         f_incremental_sampling: Callable[[list[Config]], Config],
         ml_model=None,
-        ) -> (int, int):
+        ) -> int:
 
         # print('!... new run ...!')
 
@@ -77,8 +73,8 @@ class ExprRunningUtil(object):
             f_ml_init()
         DistanceUtil.f_get_distance = f_distance
         
-        samples = f_init_sampling(init_size)
-        while len(samples) < total_size:
+        samples = f_init_sampling(Common().init_size)
+        while len(samples) < Common().total_size:
             MLUtil.f_train(samples)
             new = f_incremental_sampling(samples)
             if isinstance(new, Iterable):
@@ -93,7 +89,7 @@ class ExprRunningUtil(object):
         rank = IndicatorsUtil.get_rank(best, to_minimize=True)
         # print(f'best performance: {best.get_real_performance()}')
         
-        return (rank, total_size)
+        return rank
 
     @staticmethod
     def comparative_boxplot(rank_dict: dict, fig_size=(7,7)) -> None:
@@ -108,31 +104,24 @@ class ExprRunningUtil(object):
     def run_batch_comparative(sys_name: str, repeats: int) -> None:
     
         ranks_flash = []
-        evals_flash = []
         ranks_sail = []
-        evals_sail = []
-        
+
         Common().load_csv(sys_name)
         for _ in range(repeats):
 
-            # init_size = evals // 2
-            rank, evals = ExprRunningUtil.run(
+            rank = ExprRunningUtil.run(
                 MLUtil.using_epsilon_greedy,
                 DistanceUtil.squared_sum,
-                Common().init_size,
-                Common().total_size,
                 InitSampling.random,
-                IncrementalSampling.min_acquisition_in_once
+                IncrementalSampling.map_elites
             )
             ranks_sail.append(rank)
-            evals_sail.append(evals)
-            print(f'sail:  rank={rank}, evals={evals}')
+            print(f'sail:  rank={rank}')
 
-            # rank, evals = ExprUtil.run_flash(sys_name)
-            rank, evals = ExprRunningUtil.reproduce_flash(Common().init_size, Common().total_size)
+            # rank = ExprUtil.run_flash(sys_name)
+            rank = ExprRunningUtil.reproduce_flash()
             ranks_flash.append(rank)
-            evals_flash.append(evals)
-            print(f'flash: rank={rank}, evals={evals}')
+            print(f'flash: rank={rank}')
             
         rank_dict = {}
         rank_dict['sail'] = ranks_sail
@@ -152,19 +141,15 @@ class ExprRunningUtil(object):
             # AdaBoostRegressor(),
             ]
         Common().load_csv(sys_name)
-        init_size = 20
-        total_size = 50
         rank_dict = {}
         
         for model in models:
             start_time = time.perf_counter()
             ranks = []
             for _ in range(repeats):
-                rank, evals = ExprRunningUtil.run(
+                rank = ExprRunningUtil.run(
                     MLUtil.using_sklearn_model,
                     DistanceUtil.squared_sum,
-                    init_size,
-                    total_size,
                     InitSampling.random,
                     IncrementalSampling.min_acquisition_in_once,
                     ml_model=model
@@ -172,7 +157,7 @@ class ExprRunningUtil(object):
                 ranks.append(rank)
             elapse = time.perf_counter() - start_time
             rank_dict[MLUtil.model_name] = ranks
-            print(f'{MLUtil.model_name}: mean_rank={sum(ranks) / len(ranks)}, evals={evals}, elapse={elapse:.3f}s')
+            print(f'{MLUtil.model_name}: mean_rank={sum(ranks) / len(ranks)}, elapse={elapse:.3f}s')
         
         ExprRunningUtil.comparative_boxplot(rank_dict, fig_size=(12, 7))
 
