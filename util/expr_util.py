@@ -147,13 +147,11 @@ class ExprUtil(object):
         for _ in range(repeats):
 
             # init_size = evals // 2
-            init_size = 20
-            total_size = 50
             rank, evals = ExprUtil.run(
                 MLUtil.using_cart,
                 DistanceUtil.squared_sum,
-                init_size,
-                total_size,
+                Common().init_size,
+                Common().total_size,
                 InitSampling.random,
                 IncrementalSampling.map_elites
             )
@@ -162,7 +160,7 @@ class ExprUtil(object):
             print(f'sail:  rank={rank}, evals={evals}')
 
             # rank, evals = ExprUtil.run_flash(sys_name)
-            rank, evals = ExprUtil.reproduce_flash(init_size, total_size)
+            rank, evals = ExprUtil.reproduce_flash(Common().init_size, Common().total_size)
             ranks_flash.append(rank)
             evals_flash.append(evals)
             print(f'flash: rank={rank}, evals={evals}')

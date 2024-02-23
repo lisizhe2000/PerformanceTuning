@@ -23,6 +23,8 @@ class Common(object):
     # 在第一次实例化时，需要加载对应数据
     def __init__(self) -> None:       
         self.sys_name = None
+        self.init_size = 20
+        self.total_size = 100
 
         self.num_options = 0
         self.all_performances = []
