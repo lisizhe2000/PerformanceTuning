@@ -5,11 +5,13 @@ from testing.test_ml import TestML
 from util.config import Config
 from data_processing.common import Common
 from util.distance_util import DistanceUtil
-from util.expr_util import ExprUtil
+from util.expr_running_util import ExprRunningUtil
 from sampling.init_samples import InitSampling
 from sampling.map_elites import Feature, MapElites
 from data_processing.measurement_tree import MeasurementTree
 from sampling.sail import Sail
+from util.indicators_util import IndicatorsUtil
+
 
 class Test():
 
@@ -104,9 +106,9 @@ class Test():
     def test_sail(self):
         sail = Sail()
         config = sail.search_optimal_config()
-        print(f'Rank: {ExprUtil.get_rank(config)}, config: {config.get_selected_options_names()}, performance: {config.get_real_performance()}, num of all config: {len(Common().all_performances)}')
+        print(f'Rank: {IndicatorsUtil.get_rank(config)}, config: {config.get_selected_options_names()}, performance: {config.get_real_performance()}, num of all config: {len(Common().all_performances)}')
         with open('./res', 'a') as f:
-            f.write(f'Rank: {ExprUtil.get_rank(config)}, config: {config.get_selected_options_names()}, performance: {config.get_real_performance()}\n')
+            f.write(f'Rank: {IndicatorsUtil.get_rank(config)}, config: {config.get_selected_options_names()}, performance: {config.get_real_performance()}\n')
 
     def test_load_csv(self):
         self.data.load_csv('Apache')
@@ -128,7 +130,7 @@ class Test():
         print([config.to_bin_str() for config in samples])
 
     def test_get_rank(self):
-        rank = ExprUtil.get_performance_rank(13.0827868231411)
+        rank = ExprRunningUtil.get_performance_rank(13.0827868231411)
         print(f'rank: {rank}')
         
     def test_read_csv(self):

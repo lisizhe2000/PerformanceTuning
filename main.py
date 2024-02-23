@@ -2,9 +2,10 @@ import csv
 import time
 from data_processing.common import Common
 from util.distance_util import DistanceUtil
-from util.expr_util import ExprUtil
+from util.expr_running_util import ExprRunningUtil
 from sampling.incremental_samples import IncrementalSampling
 from sampling.init_samples import InitSampling
+from util.indicators_util import IndicatorsUtil
 from util.ml_util import MLUtil
 from util.time_counter import TimeCounter, timeit
 
@@ -32,7 +33,7 @@ def main():
             samples.append(new)
         # print(f'sample size: {len(samples)}')
     best = max(samples, key = lambda config: config.get_real_performance())
-    rank = ExprUtil.get_rank(best)
+    rank = IndicatorsUtil.get_rank(best)
     print(f'rank: {rank}')
 
     execution_time = time.perf_counter() - start_time
@@ -108,7 +109,7 @@ if __name__ == '__main__':
 
     for sys in systems:
         print(f'------ {sys} ------')
-        # ExprUtil.run_batch_comparative(sys, 20)
-        ExprUtil.run_different_models(sys, 10)
+        ExprRunningUtil.run_batch_comparative(sys, 20)
+        # ExprRunningUtil.run_different_models(sys, 10)
 
     print(TimeCounter.execution_time)
