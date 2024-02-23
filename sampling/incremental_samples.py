@@ -9,7 +9,6 @@ from util.time_counter import timeit
 
 class IncrementalSampling(object):
 
-
     @staticmethod
     @timeit
     def single_sample(already_sampled: list[Config]) -> Config:
@@ -25,7 +24,6 @@ class IncrementalSampling(object):
                 best_config = config
                 best_val_acq = val_acq
         return best_config
-
 
     @staticmethod
     def batch_sample_knn_substitution(already_sampled: list[Config]) -> tuple[Config]:
@@ -76,7 +74,6 @@ class IncrementalSampling(object):
         
         new_samples, _ = zip(*archive)
         return new_samples
-            
 
     @staticmethod
     @timeit
@@ -92,7 +89,6 @@ class IncrementalSampling(object):
                 max_acq_val = acq_vals[i]
                 best = configs[i]
         return best
-    
 
     @staticmethod
     @timeit
@@ -107,7 +103,6 @@ class IncrementalSampling(object):
                 min_acq_val = acq_vals[i]
                 best = configs[i]
         return best
-    
 
     @staticmethod
     @timeit

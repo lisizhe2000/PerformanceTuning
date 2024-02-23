@@ -16,5 +16,6 @@ def timeit(func):
         return result
     return timeit_wrapper
 
+
 class TimeCounter(object):
     execution_time = {}

@@ -17,7 +17,6 @@ class Visualization(object):
         plt.scatter(*zip(*tsne_res))
         plt.show()
 
-    
     @staticmethod
     def visualize_kmeans() -> None:
         configs = Common().configs_pool
@@ -39,7 +38,6 @@ class Visualization(object):
         plt.savefig(f'./Data/plot/kmeans/{Common().sys_name}.png')
         plt.clf()
 
-    
     @staticmethod
     def visualize_clazz_by_num_selected() -> None:
         configs = Common().configs_pool

@@ -5,6 +5,7 @@ from util.config import Config
 from data_processing.common import Common
 from sampling.map_elites import MapElites
 
+
 class Sail(object):
 
     def __init__(self) -> None:
@@ -14,7 +15,6 @@ class Sail(object):
         self.X: np.ndarray = None
         self.y: np.ndarray = None
 
-    
     def get_init_samples(self) -> list[Config]:
         prefix = './Data/InitSamples/'
         subfix = '.dimacs.samples'
@@ -47,14 +47,12 @@ class Sail(object):
                 line = f.readline()
         
         return configs
-    
 
     def init_model(self) -> xgb.Booster:
         configs = self.get_init_samples()
         self.X = np.array([config.config_options for config in configs])
         self.y = np.array([config.get_real_performance() for config in configs])
         return self.train_model()
-
 
     def search_optimal_config(self) -> Config:
 
@@ -93,8 +91,7 @@ class Sail(object):
             print('Error evaluating performance, config: {}'.format(None if best == None else best.get_selected_options_names()))
         
         return best
-    
-    
+
     def train_model(self) -> xgb.Booster:
         print('Sail: Training model......')
         dtrain = xgb.DMatrix(self.X, label=self.y)

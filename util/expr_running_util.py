@@ -43,7 +43,6 @@ class ExprRunningUtil(object):
         print(f'flash: best performance: {best_performance}')
         # return (int(rank), int(evals))
         return (rank, int(evals))
-    
 
     @staticmethod
     @timeit
@@ -57,8 +56,7 @@ class ExprRunningUtil(object):
             IncrementalSampling.min_acquisition_in_once
             )
         return (rank, evals)
-    
-    
+
     @staticmethod
     @timeit
     def run(
@@ -97,7 +95,6 @@ class ExprRunningUtil(object):
         
         return (rank, total_size)
 
-
     @staticmethod
     def comparative_boxplot(rank_dict: dict, fig_size=(7,7)) -> None:
         plt.figure(figsize=fig_size)
@@ -106,7 +103,6 @@ class ExprRunningUtil(object):
         path = f'./Data/plot/{datetime.today().strftime("%Y%m%d")}'
         Path(path).mkdir(parents=True, exist_ok=True)
         plt.savefig(f'{path}/{Common().sys_name}.png')
-
 
     @staticmethod
     def run_batch_comparative(sys_name: str, repeats: int) -> None:
@@ -142,8 +138,7 @@ class ExprRunningUtil(object):
         rank_dict['sail'] = ranks_sail
         rank_dict['flash'] = ranks_flash
         ExprRunningUtil.comparative_boxplot(rank_dict)
-        
-        
+
     @staticmethod
     def run_different_models(sys_name: str, repeats: int) -> None:
         models = [

@@ -19,7 +19,6 @@ from util.time_counter import timeit
 # Machine Learning Util
 class MLUtil(object):
 
-
     __model = None
     model_name = None
     f_predict: Callable[[Config], float] = None
@@ -32,7 +31,6 @@ class MLUtil(object):
     # multi model
     __n_carts = 4
     __alpha = 2.0
-
 
     @staticmethod
     def using_xgboost() -> None:
@@ -59,7 +57,6 @@ class MLUtil(object):
         MLUtil.f_acquist_all = MLUtil.f_precict_all
         MLUtil.acquisition_function_name = 'predicted_val'
 
-
     @staticmethod
     def using_cart() -> None:
         MLUtil.__model = DecisionTreeRegressor()
@@ -71,8 +68,7 @@ class MLUtil(object):
         MLUtil.f_acquisition = MLUtil.f_predict
         MLUtil.f_acquist_all = MLUtil.f_precict_all
         MLUtil.acquisition_function_name = 'predicted_val'
-        
-        
+
     @staticmethod
     def using_sklearn_model(model) -> None:
         MLUtil.__model = model
@@ -85,7 +81,6 @@ class MLUtil(object):
         MLUtil.f_acquist_all = MLUtil.f_precict_all
         MLUtil.acquisition_function_name = 'predicted_val'
 
-
     @staticmethod
     def using_epsilon_greedy() -> None:
         MLUtil.__bandit = EpsilonGreedy()
@@ -93,7 +88,6 @@ class MLUtil(object):
         MLUtil.f_train = MLUtil.__bandit.train
         MLUtil.f_acquist_all = MLUtil.__bandit.acquist_all
         MLUtil.acquisition_function_name = 'predicted_val'
-
 
     @staticmethod
     def using_random_forest() -> None:
@@ -106,7 +100,6 @@ class MLUtil(object):
         MLUtil.f_acquisition = MLUtil.f_predict
         MLUtil.f_acquist_all = MLUtil.f_precict_all
         MLUtil.acquisition_function_name = 'mean_predicted_of_decision_trees'
-
 
     @staticmethod
     def using_random_forest_max_val() -> None:
@@ -144,7 +137,6 @@ class MLUtil(object):
         MLUtil.f_acquist_all = acquist_all    
         MLUtil.acquisition_function_name = 'max_predicted_of_decision_trees'
 
-
     @staticmethod
     def using_random_forest_ucb() -> None:
         MLUtil.using_random_forest()
@@ -157,7 +149,6 @@ class MLUtil(object):
         
         MLUtil.f_acquist_all = acquist_all
         MLUtil.acquisition_function_name = 'random_forest_UCB'
-
 
     @staticmethod
     # FIXME: NotFittedError
@@ -175,7 +166,6 @@ class MLUtil(object):
             # pool.join()
             for dt in MLUtil.model:
                 dt.fit(X, y)
-            
 
         def acquist_all(configs: list[Config]) -> np.ndarray:
             predicted_mat = np.empty((MLUtil.__n_carts, len(configs)))
@@ -195,7 +185,6 @@ class MLUtil(object):
         MLUtil.f_train = train
         MLUtil.f_acquist_all = acquist_all
         MLUtil.acquisition_function_name = 'n_carts_UCB'
-
 
     @timeit
     def __train_sklearn_model(configs: list[Config]) -> None:
@@ -217,7 +206,6 @@ class MLUtil(object):
         for i in range(len(configs)):
             config_clazz[configs[i]] = kmeans.labels_[i]
         return config_clazz
-
 
     @staticmethod
     def configs_to_nparray(configs: list[Config]) -> np.ndarray:

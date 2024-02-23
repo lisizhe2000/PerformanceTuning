@@ -10,18 +10,15 @@ from util.time_counter import timeit
 
 class InitSampling(object):
 
-
     @staticmethod
     def diversified_distance_based_sampling(size: int) -> list[Config]:
         # TODO
         pass
 
-
     @staticmethod
     def novelty_search(size: int) -> list[Config]:
         # TODO
         pass
-
 
     @staticmethod
     @timeit
@@ -44,14 +41,12 @@ class InitSampling(object):
             samples.append(furthest_config)
         return samples
 
-    
     @staticmethod
     def random(size: int) -> list[Config]:
         pool = Common().configs_pool
         clone = [config for config in pool]
         random.shuffle(clone)
         return clone[:size]
-    
 
     @staticmethod
     def random_each_num_selected(size: int) -> list[Config]:
@@ -73,7 +68,6 @@ class InitSampling(object):
             num_samples[i] += 1
         # TODO: 有可能会出现某个num_selected的config不够的情况
 
-    
     @staticmethod
     def random_each_kmeans_clazz(size: int) -> list[Config]:
         pool = Common().configs_pool

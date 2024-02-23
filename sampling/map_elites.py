@@ -6,11 +6,12 @@ from util.config import Config
 
 from data_processing.common import Common
 from util.ml_util import MLUtil
+from util.time_counter import timeit
 
 
 class MapElites(object):
 
-
+    @timeit
     def __init__(self, to_minimize=True) -> None:
         self.num_options = Common().num_options
         self.to_minimize = to_minimize
@@ -31,7 +32,6 @@ class MapElites(object):
         self.best_config: Config = None
         self.best_val_acq = float('-inf')
 
-
     def search_configs(self, iteration: int) -> Config:
         print('\tMAP-Elites: Initializing......')
         # self.init()
@@ -41,20 +41,17 @@ class MapElites(object):
                 print('\tMAP-Elits: iteration {}......'.format(i))
             self.evolve()
         return self.best_config
-    
 
     def init(self) -> None:
         for i in range(self.num_init_samples):
             config = Config.get_next_sat_config()
             self.update_archive(config)
-        
 
     # 一次迭代
     # generated way
     def evolve(self) -> None:
         new = Config.get_next_sat_config()
         self.update_archive(new)
-
 
     def select(self) -> list[int]:
         indices = []
@@ -63,14 +60,13 @@ class MapElites(object):
             indices.append(index)
         return indices
 
-
     def get_from_archive(self, indices: list[int]) -> Config:
         tmp = self.archive
         for idx in indices:
             tmp = tmp[idx]
         return tmp[0]
     
-
+    @timeit
     def update_archive(self, config: Config, val_acquisition=None) -> None:
         tmp = self.archive
         for i in range(self.dimension - 1):
@@ -88,14 +84,13 @@ class MapElites(object):
                 self.best_val_acq = val_acquisition
             # print('\t\tBetter config found. old_val_acq: {}, new_val_acq: {}'.format(old_val_acq, val_acquisition))
 
-    
+    @timeit
     def batch_update_archive(self, configs: list[Config]) -> None:
         val_acqs = MLUtil.f_acquist_all(configs)
         for i in range(len(configs)):
             config = configs[i]
             val_acquisition = val_acqs[i]
             self.update_archive(config, val_acquisition)
-
 
     def sample_from_archive(self, best_n=3) -> Config:
         elites = self.archive.flatten()
@@ -106,7 +101,6 @@ class MapElites(object):
         elites = sorted(elites, key=lambda x: x[1], reverse=not self.to_minimize)[:best_n]  # sort by val_acquisition
         # choose one from best_n elites
         return elites[np.random.randint(best_n)][0]
-
 
 
 class Feature(object):

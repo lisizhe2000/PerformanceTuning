@@ -12,6 +12,7 @@ from data_processing.common import Common
 from scipy.optimize import curve_fit
 
 from util.config import Config
+from util.time_counter import timeit
 
 
 class EpsilonGreedy(object):
@@ -33,8 +34,8 @@ class EpsilonGreedy(object):
         
         self.get_epsilon = EpsilonGreedy.calc_epsilon_function()    # 随着迭代次数变小的epsilon
         self.epsilon = 0.2  # 固定的epsilon
-        
-        
+
+    @timeit
     def train(self, configs: list[Config]) -> None:
         Operation = Enum('Operation', ['INIT', 'EXPLORE', 'EXPLOIT'])
         
@@ -67,8 +68,8 @@ class EpsilonGreedy(object):
         y = np.array([config.get_real_performance() for config in configs])
         self.best_model.fit(X, y)
         self.count += 1
-    
-    
+
+    @timeit
     def acquist_all(self, configs: list[Config]) -> list[float]:
         predicted =  self.model_this_turn.predict(self.configs_to_nparray(configs))
         best_performance = min(predicted)
@@ -85,8 +86,8 @@ class EpsilonGreedy(object):
                 self.best_model_id = self.model_id
         # print(f'best model: {self.best_model_id}, model: {self.model_id}')
         return predicted
-    
-    
+
+    @staticmethod
     def calc_epsilon_function() -> Callable[[int], float]:
         warnings.filterwarnings("ignore")
         def epsilon_function(x, a, b):
@@ -105,8 +106,7 @@ class EpsilonGreedy(object):
             if math.isclose(performance, sorted_performances[i]):
                 return i
         return -1
-    
-    
+
     @staticmethod
     def configs_to_nparray(configs: list[Config]) -> np.ndarray:
         return np.array([config.config_options for config in configs])
