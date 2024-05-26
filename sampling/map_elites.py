@@ -16,15 +16,19 @@ class MapElites(object):
         self.num_options = Common().num_options
         self.to_minimize = to_minimize
 
-        # features
+        # use num_selected as feature
         # num_selected = Feature(0, self.num_options + 1, self.num_options + 1, lambda configs: reduce(lambda x, y: x+y, configs.config_options))
         # self.features: list[Feature] = [num_selected]
-        self.config_clazz: Dict[Config, int] = MLUtil.get_kmeans_clazz(Common().configs_pool)
-        kmeans_clazz = Feature(0, MLUtil.kmeans_n_clusters, MLUtil.kmeans_n_clusters, lambda config: self.config_clazz[config])
+        # self.shape = (self.num_options + 1, )
+        
+        # use k-means as feature
+        if MLUtil.config_clazz is None:
+            MLUtil.config_clazz = MLUtil.get_kmeans_clazz(Common().configs_pool)
+        kmeans_clazz = Feature(0, MLUtil.kmeans_n_clusters, MLUtil.kmeans_n_clusters, lambda config: MLUtil.config_clazz[config])
         self.features: list[Feature] = [kmeans_clazz]
+        self.shape = (MLUtil.kmeans_n_clusters, )
 
         self.dimension = len(self.features)
-        self.shape = (self.num_options + 1, )
         self.archive: np.ndarray = np.empty(self.shape, dtype=object)   # store a (config, val_acquisition) each cell
 
         self.num_init_samples = 2 * self.num_options

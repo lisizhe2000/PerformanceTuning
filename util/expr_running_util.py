@@ -89,7 +89,13 @@ class ExprRunningUtil(object):
         rank = IndicatorsUtil.get_rank(best, to_minimize=True)
         # print(f'best performance: {best.get_real_performance()}')
         
+        ExprRunningUtil.cleanUp()
+        
         return rank
+    
+    @staticmethod
+    def cleanUp():
+        MLUtil.config_clazz = None
 
     @staticmethod
     def comparative_boxplot(rank_dict: dict, fig_size=(7,7)) -> None:
