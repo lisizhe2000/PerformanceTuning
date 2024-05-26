@@ -5,11 +5,11 @@ from pathlib import Path
 import re
 import subprocess
 import time
-from typing import Callable, Iterable
+from typing import Callable, Dict, Iterable
 
 from matplotlib import pyplot as plt
 from sklearn.ensemble import AdaBoostRegressor, RandomForestRegressor
-from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.linear_model import LinearRegression, LogisticRegression, Ridge
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
@@ -49,6 +49,17 @@ class ExprRunningUtil(object):
     def reproduce_flash() -> int:
         rank = ExprRunningUtil.run(
             MLUtil.using_cart,
+            None,
+            InitSampling.random,
+            IncrementalSampling.min_acquisition_in_once
+            )
+        return rank
+    
+    @staticmethod
+    @timeit
+    def reproduce_gil() -> int:
+        rank = ExprRunningUtil.run(
+            MLUtil.using_ridge,
             None,
             InitSampling.random,
             IncrementalSampling.min_acquisition_in_once
@@ -107,10 +118,19 @@ class ExprRunningUtil(object):
         plt.savefig(f'{path}/{Common().sys_name}.png')
 
     @staticmethod
+    def save_result(rank_dict: Dict[str, list[int]]):
+        path = f'./Data/result/{datetime.today().strftime("%Y%m%d")}'
+        for key, ranks in rank_dict.items():
+            Path(f'{path}/{key}').mkdir(parents=True, exist_ok=True)
+            with open(f'{path}/{key}/{Common().sys_name}.txt', 'w') as f:
+                f.writelines([str(rank) + '\n' for rank in ranks])
+
+    @staticmethod
     def run_batch_comparative(sys_name: str, repeats: int) -> None:
     
         ranks_flash = []
         ranks_sail = []
+        ranks_gil = []
 
         Common().load_csv(sys_name)
         for _ in range(repeats):
@@ -129,10 +149,16 @@ class ExprRunningUtil(object):
             ranks_flash.append(rank)
             print(f'flash: rank={rank}')
             
+            rank = ExprRunningUtil.reproduce_gil()
+            ranks_gil.append(rank)
+            print(f'gil: rank={rank}')
+            
         rank_dict = {}
         rank_dict['sail'] = ranks_sail
         rank_dict['flash'] = ranks_flash
+        rank_dict['gil'] = ranks_gil
         ExprRunningUtil.comparative_boxplot(rank_dict)
+        ExprRunningUtil.save_result(rank_dict)
 
     @staticmethod
     def run_different_models(sys_name: str, repeats: int) -> None:

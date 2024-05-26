@@ -4,6 +4,7 @@ import warnings
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import Ridge
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
@@ -61,6 +62,18 @@ class MLUtil(object):
     def using_cart() -> None:
         MLUtil.__model = DecisionTreeRegressor()
         MLUtil.model_name = 'CART'
+
+        MLUtil.f_train = MLUtil.__train_sklearn_model
+        MLUtil.f_predict = lambda config: MLUtil.__model.predict(np.array([config.config_options]))[0]
+        MLUtil.f_precict_all = lambda configs: MLUtil.__model.predict(MLUtil.configs_to_nparray(configs))
+        MLUtil.f_acquisition = MLUtil.f_predict
+        MLUtil.f_acquist_all = MLUtil.f_precict_all
+        MLUtil.acquisition_function_name = 'predicted_val'
+        
+    @staticmethod
+    def using_ridge() -> None:
+        MLUtil.__model = Ridge()
+        MLUtil.model_name = 'Ridge'
 
         MLUtil.f_train = MLUtil.__train_sklearn_model
         MLUtil.f_predict = lambda config: MLUtil.__model.predict(np.array([config.config_options]))[0]
