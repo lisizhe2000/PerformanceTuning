@@ -6,4 +6,7 @@ res
 results.csv
 Data/plot/**
 **/JavaGC*
-**/sac*
+nohup.out
+tmp.png
+tmp.txt
+.idea
