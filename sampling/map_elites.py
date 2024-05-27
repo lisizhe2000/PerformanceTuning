@@ -1,7 +1,5 @@
 from functools import reduce
-from typing import Dict
 import numpy as np
-import xgboost as xgb
 
 from settings import Settings
 from util.config import Config

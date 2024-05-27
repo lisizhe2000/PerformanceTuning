@@ -1,4 +1,3 @@
-import csv
 import math
 import re
 import xml.etree.ElementTree as ET
@@ -68,7 +67,6 @@ class Common(object):
                     self.constraints.append(tokens[:-1])
                 line = f.readline()             
 
-
     def __parse_measurements(self) -> None:
         prefix = './Data/AllMeasurements/'
         subfix = '_raw_bin.xml'
@@ -95,7 +93,6 @@ class Common(object):
 
             self.measurement_tree.make_measurement_node(config_options_list, performance)
 
-
     def load_xml(self, sys_name: str, performance_col_name: str) -> None:
         self.sys_name = sys_name
         self.performance_col_name = performance_col_name
@@ -105,7 +102,6 @@ class Common(object):
         self.cnf = CNF(from_file=dimacs_path)
         self.solver = Minisat22(bootstrap_with=self.cnf)
         self.sat_config_iter = self.solver.enum_models()
-
     
     def load_csv(self, sys_name: str, chunk_reading=False) -> None:
         self.sys_name = sys_name
