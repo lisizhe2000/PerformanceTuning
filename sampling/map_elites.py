@@ -18,17 +18,7 @@ class MapElites(object):
         self.num_options = Common().num_options
         self.to_minimize = to_minimize
 
-        # use num_selected as feature
-        # num_selected = Feature(0, self.num_options + 1, self.num_options + 1, lambda configs: reduce(lambda x, y: x+y, configs.config_options))
-        # self.features: list[Feature] = [num_selected]
-        # self.shape = (self.num_options + 1, )
-        
-        # use k-means as feature
-        if MLUtil.config_clazz is None:
-            MLUtil.config_clazz = MLUtil.get_kmeans_clazz(Common().configs_pool)
-        kmeans_clazz = Feature(0, Settings.kmeans_n_clusters, Settings.kmeans_n_clusters, lambda config: MLUtil.config_clazz[config])
-        self.features: list[Feature] = [kmeans_clazz]
-        self.shape = (Settings.kmeans_n_clusters, )
+        self.features, self.shape = use_feature_kmeans()
 
         self.dimension = len(self.features)
         self.archive: np.ndarray = np.empty(self.shape, dtype=object)   # store a (config, val_acquisition) each cell
@@ -120,3 +110,26 @@ class Feature(object):
     def get_index(self, config: Config) -> int:
         feature_value = self.eval_func(config)
         return int((feature_value - self.lb) / self.step)
+
+
+def use_feature_num_selected() -> (list[Feature], tuple[int]):
+    num_options = Common().num_options
+    feature_num_selected = Feature(
+        0,
+        num_options + 1,
+        num_options + 1,
+        lambda configs: reduce(lambda x, y: x+y, configs.config_options)
+    )
+    return [feature_num_selected], (num_options + 1, )
+
+
+def use_feature_kmeans() -> (list[Feature], tuple[int]):
+    if MLUtil.config_clazz is None:
+        MLUtil.config_clazz = MLUtil.get_kmeans_clazz(Common().configs_pool)
+    feature_kmeans_clazz = Feature(
+        0,
+        Settings.kmeans_n_clusters,
+        Settings.kmeans_n_clusters,
+        lambda config: MLUtil.config_clazz[config]
+    )
+    return [feature_kmeans_clazz], (Settings.kmeans_n_clusters, )
