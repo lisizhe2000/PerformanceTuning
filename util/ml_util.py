@@ -10,6 +10,7 @@ from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
 import xgboost as xgb
 
+from settings import Settings
 from util.config import Config
 from typing import Callable, Dict
 from util.multi_armed_bandit import EpsilonGreedy
@@ -206,7 +207,6 @@ class MLUtil(object):
         MLUtil.__model.fit(X, y)
 
 
-    kmeans_n_clusters = 8
     config_clazz: Dict[Config, int] = None
     @staticmethod
     def get_kmeans_clazz(configs: list[Config]) -> Dict[Config, int]:
@@ -214,7 +214,7 @@ class MLUtil(object):
             # return config_clazz
         warnings.filterwarnings("ignore")
         X = MLUtil.configs_to_nparray(configs)
-        kmeans = KMeans(n_clusters=MLUtil.kmeans_n_clusters).fit(X)
+        kmeans = KMeans(n_clusters=Settings.kmeans_n_clusters).fit(X)
         config_clazz = {}
         for i in range(len(configs)):
             config_clazz[configs[i]] = kmeans.labels_[i]

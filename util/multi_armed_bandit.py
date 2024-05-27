@@ -11,6 +11,7 @@ from sklearn.tree import DecisionTreeRegressor
 from data_processing.common import Common
 from scipy.optimize import curve_fit
 
+from settings import Settings
 from util.config import Config
 from util.time_counter import timeit
 
@@ -33,7 +34,6 @@ class EpsilonGreedy(object):
         self.model_id = None
         
         self.get_epsilon = EpsilonGreedy.calc_epsilon_function()    # 随着迭代次数变小的epsilon
-        self.epsilon = 0.2  # 固定的epsilon
 
     @timeit
     def train(self, configs: list[Config]) -> None:
@@ -42,7 +42,7 @@ class EpsilonGreedy(object):
         op = None
         if self.count < len(self.models):
             op = Operation.INIT
-        elif random.random() < self.epsilon:    # explore
+        elif random.random() < Settings.epsilon:    # explore
         # elif random.random() < self.get_epsilon(self.count):    # explore
             op = Operation.EXPLORE
         else:   # exploit

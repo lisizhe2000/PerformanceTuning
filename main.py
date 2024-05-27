@@ -59,14 +59,14 @@ if __name__ == '__main__':
     # main()
 
     systems = [
-        # 'Apache',
-        # 'BDBC',
-        # 'Dune',
-        # 'HSMGP',
-        # 'lrzip',
-        # 'SQL',
-        # 'WGet',
-        # 'X264',
+        'Apache',
+        'BDBC',
+        'Dune',
+        'HSMGP',
+        'lrzip',
+        'SQL',
+        'WGet',
+        'X264',
 
         # 'SS-A1',
         # 'SS-A2',
@@ -93,18 +93,18 @@ if __name__ == '__main__':
         # 'SS-L1',
         # 'SS-L2',
         
-        'SS-M1',
-        'SS-M2',
-        'SS-N1',
-        'SS-N2',
-        'SS-O1',
-        'SS-O2',
-        #        # 'JavaGC',
-        'JavaGC_num',
-        'sac_compile-cpu',
-        'sac_compile-maxmem',
-        'sac_run-cpu',
-        'sac_run-maxmem',
+        # 'SS-M1',
+        # 'SS-M2',
+        # 'SS-N1',
+        # 'SS-N2',
+        # 'SS-O1',
+        # 'SS-O2',
+        
+        # 'JavaGC_num',
+        # 'sac_compile-cpu',
+        # 'sac_compile-maxmem',
+        # 'sac_run-cpu',
+        # 'sac_run-maxmem',
     ]
 
     for sys in systems:

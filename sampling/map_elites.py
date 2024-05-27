@@ -2,6 +2,8 @@ from functools import reduce
 from typing import Dict
 import numpy as np
 import xgboost as xgb
+
+from settings import Settings
 from util.config import Config
 
 from data_processing.common import Common
@@ -24,9 +26,9 @@ class MapElites(object):
         # use k-means as feature
         if MLUtil.config_clazz is None:
             MLUtil.config_clazz = MLUtil.get_kmeans_clazz(Common().configs_pool)
-        kmeans_clazz = Feature(0, MLUtil.kmeans_n_clusters, MLUtil.kmeans_n_clusters, lambda config: MLUtil.config_clazz[config])
+        kmeans_clazz = Feature(0, Settings.kmeans_n_clusters, Settings.kmeans_n_clusters, lambda config: MLUtil.config_clazz[config])
         self.features: list[Feature] = [kmeans_clazz]
-        self.shape = (MLUtil.kmeans_n_clusters, )
+        self.shape = (Settings.kmeans_n_clusters, )
 
         self.dimension = len(self.features)
         self.archive: np.ndarray = np.empty(self.shape, dtype=object)   # store a (config, val_acquisition) each cell
