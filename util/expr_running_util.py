@@ -100,12 +100,12 @@ class ExprRunningUtil(object):
         rank = IndicatorsUtil.get_rank(best, to_minimize=True)
         # print(f'best performance: {best.get_real_performance()}')
         
-        ExprRunningUtil.cleanUp()
+        ExprRunningUtil.clean_up()
         
         return rank
     
     @staticmethod
-    def cleanUp():
+    def clean_up():
         MLUtil.config_clazz = None
 
     @staticmethod
