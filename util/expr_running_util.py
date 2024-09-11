@@ -1,5 +1,4 @@
 from datetime import datetime
-import math 
 import os
 from pathlib import Path
 import re
@@ -7,9 +6,13 @@ import subprocess
 import time
 from typing import Callable, Dict, Iterable
 
+import lightgbm as lgb
+import numpy as np
+import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn.ensemble import AdaBoostRegressor, RandomForestRegressor
 from sklearn.linear_model import LinearRegression, LogisticRegression, Ridge
+from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
@@ -21,6 +24,55 @@ from util.distance_util import DistanceUtil
 from util.indicators_util import IndicatorsUtil
 from util.ml_util import MLUtil
 from util.time_counter import timeit
+
+systems = [
+    'Apache',
+    'BDBC',
+    'Dune',
+    'HSMGP',
+    'lrzip',
+    'SQL',
+    'WGet',
+    'X264',
+
+    'SS-A1',
+    'SS-A2',
+    'SS-B1',
+    'SS-B2',
+    'SS-C1',
+    'SS-C2',
+    'SS-D1',
+    'SS-D2',
+    'SS-E1',
+    'SS-E2',
+    'SS-F1',
+    'SS-F2',
+    'SS-G1',
+    'SS-G2',
+    'SS-H1',
+    'SS-H2',
+    'SS-I1',
+    'SS-I2',
+    'SS-J1',
+    'SS-J2',
+    'SS-K1',
+    'SS-K2',
+    'SS-L1',
+    'SS-L2',
+
+    # 'SS-M1',
+    # 'SS-M2',
+    # 'SS-N1',
+    # 'SS-N2',
+    # 'SS-O1',
+    # 'SS-O2',
+
+    # 'JavaGC_num',
+    # 'sac_compile-cpu',
+    # 'sac_compile-maxmem',
+    # 'sac_run-cpu',
+    # 'sac_run-maxmem',
+]
 
 
 class ExprRunningUtil(object):
@@ -193,3 +245,30 @@ class ExprRunningUtil(object):
         
         ExprRunningUtil.comparative_boxplot(rank_dict, fig_size=(12, 7))
 
+    @staticmethod
+    def get_mse() -> None:
+        models = [
+            DecisionTreeRegressor(),
+            KNeighborsRegressor(),
+            SVR(),
+            SVR(kernel='poly', C=1.0, epsilon=0.1),
+            LinearRegression(),
+            lgb.LGBMRegressor(verbosity=-1),
+            ]
+        data = []
+        for sys in systems:
+            Common().load_csv(sys)
+            configs = Common().configs_pool
+            np.random.shuffle(configs)
+            X = MLUtil.configs_to_nparray(configs)
+            y = np.array([config.get_real_performance() for config in configs])
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+            for model in models:
+                model.fit(X_train, y_train)
+                y_pred = model.predict(X_test)
+                mse = np.mean((y_test - y_pred) ** 2)
+                print(f'{sys:10s} {model.__class__.__name__:30s} mse: {mse:.3f}')
+                data.append([sys, model.__class__.__name__, mse])
+                df = pd.DataFrame(data, columns=['sys', 'model', 'MSE'])
+                df.to_csv('./Data/mse.csv', index=False)
+            data.append(['', '', ''])
