@@ -7,9 +7,11 @@ import time
 from typing import Callable, Dict, Iterable
 
 import lightgbm as lgb
+import matplotlib
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+matplotlib.use('Agg')
 from sklearn.ensemble import AdaBoostRegressor, RandomForestRegressor
 from sklearn.linear_model import LinearRegression, LogisticRegression, Ridge
 from sklearn.model_selection import train_test_split
