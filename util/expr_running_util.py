@@ -274,3 +274,33 @@ class ExprRunningUtil(object):
                 df = pd.DataFrame(data, columns=['sys', 'model', 'MSE'])
                 df.to_csv('./Data/mse.csv', index=False)
             data.append(['', '', ''])
+
+    @staticmethod
+    def get_training_time() -> None:
+        models = [
+            DecisionTreeRegressor(),
+            KNeighborsRegressor(),
+            SVR(),
+            SVR(kernel='poly', C=1.0, epsilon=0.1),
+            LinearRegression(),
+            Ridge(),
+            lgb.LGBMRegressor(verbosity=-1),
+            RandomForestRegressor(),
+            GaussianProcessRegressor(kernel='')
+            ]
+        data = []
+        for sys in systems:
+            Common().load_csv(sys)
+            configs = Common().configs_pool
+            np.random.shuffle(configs)
+            X = MLUtil.configs_to_nparray(configs)
+            y = np.array([config.get_real_performance() for config in configs])
+            for model in models:
+                start_time = time.perf_counter()
+                model.fit(X[:50], y[:50])
+                train_elapse = time.perf_counter() - start_time
+                start_time = time.perf_counter()
+                model.predict(X)
+                predict_elapse = time.perf_counter() - start_time
+                print(f'{sys:10s} {model.__class__.__name__:30s} train: {train_elapse:.3f}, predict: {predict_elapse:.3f}')
+                data.append([sys, model.__class__.__name__, train_elapse, predict_elapse])
