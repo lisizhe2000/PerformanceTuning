@@ -4,10 +4,12 @@ import random
 from typing import Callable
 import warnings
 import numpy as np
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import Ridge
+from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
+from lightgbm import LGBMRegressor
 from data_processing.common import Common
 from scipy.optimize import curve_fit
 
@@ -21,9 +23,9 @@ class EpsilonGreedy(object):
         self.count = 0
         self.models = [
             DecisionTreeRegressor(),
-            KNeighborsRegressor(),
-            SVR(),
-            LinearRegression()
+            LGBMRegressor(verbosity=-1),
+            SVR(kernel='poly', C=1.0, epsilon=0.1),
+            Ridge(),
             ]
         self.best_scores = [float('inf') for _ in range(len(self.models))]
         self.best_model = None
@@ -55,9 +57,20 @@ class EpsilonGreedy(object):
             self.model_id = self.best_model_id
         elif op == Operation.EXPLORE:    # explore
             self.model_id = random.randint(0, len(self.models) - 1)
-            while self.model_id == self.best_model_id:
-                self.model_id = random.randint(0, len(self.models) - 1)
-            self.model_this_turn = self.models[self.model_id]
+            best_mse = float('inf')
+            np.random.shuffle(configs)
+            X = self.configs_to_nparray(configs)
+            y = np.array([config.get_real_performance() for config in configs])
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+            for model in self.models:
+                model.fit(X_train, y_train)
+                mse = np.mean((model.predict(X_test) - y_test) ** 2)
+                if mse < best_mse:
+                    best_mse = mse
+                    self.best_model = model
+                    self.best_model_id = self.model_id
+            self.model_id = self.best_model_id
+            self.model_this_turn = self.best_model
         elif op == Operation.EXPLOIT:   # exploit
             self.model_this_turn = self.best_model
             self.model_id = self.best_model_id
