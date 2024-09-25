@@ -11,6 +11,9 @@ import matplotlib
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import RBF
+
 matplotlib.use('Agg')
 from sklearn.ensemble import AdaBoostRegressor, RandomForestRegressor
 from sklearn.linear_model import LinearRegression, LogisticRegression, Ridge
@@ -255,7 +258,9 @@ class ExprRunningUtil(object):
             SVR(),
             SVR(kernel='poly', C=1.0, epsilon=0.1),
             LinearRegression(),
+            Ridge(),
             lgb.LGBMRegressor(verbosity=-1),
+            RandomForestRegressor(),
             ]
         data = []
         for sys in systems:
@@ -265,15 +270,17 @@ class ExprRunningUtil(object):
             X = MLUtil.configs_to_nparray(configs)
             y = np.array([config.get_real_performance() for config in configs])
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+            X_train, y_train = X_train[:50], y_train[:50]
             for model in models:
                 model.fit(X_train, y_train)
                 y_pred = model.predict(X_test)
                 mse = np.mean((y_test - y_pred) ** 2)
-                print(f'{sys:10s} {model.__class__.__name__:30s} mse: {mse:.3f}')
-                data.append([sys, model.__class__.__name__, mse])
-                df = pd.DataFrame(data, columns=['sys', 'model', 'MSE'])
-                df.to_csv('./Data/mse.csv', index=False)
+                rmse = np.sqrt(mse)
+                print(f'{sys:10s} {model.__class__.__name__:30s} rmse: {rmse:.3f}')
+                data.append([sys, model.__class__.__name__, rmse])
             data.append(['', '', ''])
+        df = pd.DataFrame(data, columns=['sys', 'model', 'MSE'])
+        df.to_csv('./Data/rmse.csv', index=False)
 
     @staticmethod
     def get_training_time() -> None:
@@ -285,8 +292,7 @@ class ExprRunningUtil(object):
             LinearRegression(),
             Ridge(),
             lgb.LGBMRegressor(verbosity=-1),
-            RandomForestRegressor(),
-            GaussianProcessRegressor(kernel='')
+            GaussianProcessRegressor(kernel=RBF()),
             ]
         data = []
         for sys in systems:
@@ -297,10 +303,12 @@ class ExprRunningUtil(object):
             y = np.array([config.get_real_performance() for config in configs])
             for model in models:
                 start_time = time.perf_counter()
-                model.fit(X[:50], y[:50])
+                for _ in range(50):
+                    model.fit(X[:50], y[:50])
                 train_elapse = time.perf_counter() - start_time
                 start_time = time.perf_counter()
-                model.predict(X)
+                for _ in range(50):
+                    model.predict(X)
                 predict_elapse = time.perf_counter() - start_time
                 print(f'{sys:10s} {model.__class__.__name__:30s} train: {train_elapse:.3f}, predict: {predict_elapse:.3f}')
                 data.append([sys, model.__class__.__name__, train_elapse, predict_elapse])
