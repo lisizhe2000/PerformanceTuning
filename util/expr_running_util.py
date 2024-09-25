@@ -196,7 +196,7 @@ class ExprRunningUtil(object):
                 MLUtil.using_epsilon_greedy,
                 DistanceUtil.squared_sum,
                 InitSampling.random,
-                IncrementalSampling.map_elites
+                IncrementalSampling.min_acq_with_shapley_mutated,
             )
             ranks_sail.append(rank)
             print(f'sail:  rank={rank}')

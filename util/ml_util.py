@@ -21,14 +21,15 @@ from util.time_counter import timeit
 # Machine Learning Util
 class MLUtil(object):
 
-    __model = None
+    model = None
     model_name = None
     f_predict: Callable[[Config], float] = None
-    f_precict_all: Callable[[list[Config]], np.ndarray] = None
+    f_predict_all: Callable[[list[Config]], np.ndarray] = None
     f_train: Callable[[list[Config]], None] = None  # Train the model above
     f_acquisition: Callable[[Config], float] = None
     f_acquist_all: Callable[[list[Config]], np.ndarray] = None
     acquisition_function_name = None
+    bandit: EpsilonGreedy = None
 
     # multi model
     __n_carts = 4
@@ -41,7 +42,7 @@ class MLUtil(object):
             'eta': 1,
             'objective': 'reg:squarederror'
         }
-        MLUtil.__model: xgb.Booster = None
+        MLUtil.model: xgb.Booster = None
         MLUtil.model_name = 'xgboost'
 
         @timeit
@@ -50,69 +51,69 @@ class MLUtil(object):
             y = np.array([config.get_real_performance() for config in configs])
             dtrain = xgb.DMatrix(X, label=y)
             num_round = 10
-            MLUtil.__model = xgb.train(MLUtil.param, dtrain, num_round)
+            MLUtil.model = xgb.train(MLUtil.param, dtrain, num_round)
 
         MLUtil.f_train = train
-        MLUtil.f_predict = lambda config: MLUtil.__model.predict(xgb.DMatrix(np.array([config.config_options])))[0]
-        MLUtil.f_precict_all = lambda configs: MLUtil.__model.predict(xgb.DMatrix(MLUtil.configs_to_nparray(configs)))
+        MLUtil.f_predict = lambda config: MLUtil.model.predict(xgb.DMatrix(np.array([config.config_options])))[0]
+        MLUtil.f_predict_all = lambda configs: MLUtil.model.predict(xgb.DMatrix(MLUtil.configs_to_nparray(configs)))
         MLUtil.f_acquisition = MLUtil.f_predict
-        MLUtil.f_acquist_all = MLUtil.f_precict_all
+        MLUtil.f_acquist_all = MLUtil.f_predict_all
         MLUtil.acquisition_function_name = 'predicted_val'
 
     @staticmethod
     def using_cart() -> None:
-        MLUtil.__model = DecisionTreeRegressor()
+        MLUtil.model = DecisionTreeRegressor()
         MLUtil.model_name = 'CART'
 
         MLUtil.f_train = MLUtil.__train_sklearn_model
-        MLUtil.f_predict = lambda config: MLUtil.__model.predict(np.array([config.config_options]))[0]
-        MLUtil.f_precict_all = lambda configs: MLUtil.__model.predict(MLUtil.configs_to_nparray(configs))
+        MLUtil.f_predict = lambda config: MLUtil.model.predict(np.array([config.config_options]))[0]
+        MLUtil.f_predict_all = lambda configs: MLUtil.model.predict(MLUtil.configs_to_nparray(configs))
         MLUtil.f_acquisition = MLUtil.f_predict
-        MLUtil.f_acquist_all = MLUtil.f_precict_all
+        MLUtil.f_acquist_all = MLUtil.f_predict_all
         MLUtil.acquisition_function_name = 'predicted_val'
         
     @staticmethod
     def using_ridge() -> None:
-        MLUtil.__model = Ridge()
+        MLUtil.model = Ridge()
         MLUtil.model_name = 'Ridge'
 
         MLUtil.f_train = MLUtil.__train_sklearn_model
-        MLUtil.f_predict = lambda config: MLUtil.__model.predict(np.array([config.config_options]))[0]
-        MLUtil.f_precict_all = lambda configs: MLUtil.__model.predict(MLUtil.configs_to_nparray(configs))
+        MLUtil.f_predict = lambda config: MLUtil.model.predict(np.array([config.config_options]))[0]
+        MLUtil.f_predict_all = lambda configs: MLUtil.model.predict(MLUtil.configs_to_nparray(configs))
         MLUtil.f_acquisition = MLUtil.f_predict
-        MLUtil.f_acquist_all = MLUtil.f_precict_all
+        MLUtil.f_acquist_all = MLUtil.f_predict_all
         MLUtil.acquisition_function_name = 'predicted_val'
 
     @staticmethod
     def using_sklearn_model(model) -> None:
-        MLUtil.__model = model
+        MLUtil.model = model
         MLUtil.model_name = model.__class__.__name__
         
         MLUtil.f_train = MLUtil.__train_sklearn_model
-        MLUtil.f_predict = lambda config: MLUtil.__model.predict(np.array([config.config_options]))[0]
-        MLUtil.f_precict_all = lambda configs: MLUtil.__model.predict(MLUtil.configs_to_nparray(configs))
+        MLUtil.f_predict = lambda config: MLUtil.model.predict(np.array([config.config_options]))[0]
+        MLUtil.f_predict_all = lambda configs: MLUtil.model.predict(MLUtil.configs_to_nparray(configs))
         MLUtil.f_acquisition = MLUtil.f_predict
-        MLUtil.f_acquist_all = MLUtil.f_precict_all
+        MLUtil.f_acquist_all = MLUtil.f_predict_all
         MLUtil.acquisition_function_name = 'predicted_val'
 
     @staticmethod
     def using_epsilon_greedy() -> None:
-        MLUtil.__bandit = EpsilonGreedy()
+        MLUtil.bandit = EpsilonGreedy()
         MLUtil.model_name = 'epsilon_greedy'
-        MLUtil.f_train = MLUtil.__bandit.train
-        MLUtil.f_acquist_all = MLUtil.__bandit.acquist_all
+        MLUtil.f_train = MLUtil.bandit.train
+        MLUtil.f_acquist_all = MLUtil.bandit.acquist_all
         MLUtil.acquisition_function_name = 'predicted_val'
 
     @staticmethod
     def using_random_forest() -> None:
-        MLUtil.__model = RandomForestRegressor(n_estimators=MLUtil.__n_carts)
+        MLUtil.model = RandomForestRegressor(n_estimators=MLUtil.__n_carts)
         MLUtil.model_name = 'RandomForest'
 
         MLUtil.f_train = MLUtil.__train_sklearn_model
-        MLUtil.f_predict = lambda config: MLUtil.__model.predict(np.array([config.config_options]))[0]
-        MLUtil.f_precict_all = lambda configs: MLUtil.__model.predict(MLUtil.configs_to_nparray(configs))
+        MLUtil.f_predict = lambda config: MLUtil.model.predict(np.array([config.config_options]))[0]
+        MLUtil.f_predict_all = lambda configs: MLUtil.model.predict(MLUtil.configs_to_nparray(configs))
         MLUtil.f_acquisition = MLUtil.f_predict
-        MLUtil.f_acquist_all = MLUtil.f_precict_all
+        MLUtil.f_acquist_all = MLUtil.f_predict_all
         MLUtil.acquisition_function_name = 'mean_predicted_of_decision_trees'
 
     @staticmethod
@@ -123,7 +124,7 @@ class MLUtil(object):
             max_val = float('-inf')
             pool = Pool()
             res = []
-            for dt in MLUtil.__model.estimators_:
+            for dt in MLUtil.model.estimators_:
                 res.append(pool.apply_async(dt.predict, [np.array(config.config_options)]))
             pool.close()
             pool.join()
@@ -135,12 +136,12 @@ class MLUtil(object):
 
         # 速度要慢几十倍，效果也差不多
         def acquist_all(configs: list[Config]) -> np.ndarray:
-            num_trees = len(MLUtil.__model.estimators_)
+            num_trees = len(MLUtil.model.estimators_)
             predicted_mat = np.empty((num_trees, len(configs)))
             pool = Pool()
             res = []
             for i in range(num_trees):
-                res.append(pool.apply_async(MLUtil.__model.estimators_[i].predict, [MLUtil.configs_to_nparray(configs)]))
+                res.append(pool.apply_async(MLUtil.model.estimators_[i].predict, [MLUtil.configs_to_nparray(configs)]))
             pool.close()
             pool.join()
             for i in range(num_trees):
@@ -158,7 +159,7 @@ class MLUtil(object):
         def acquist_all(configs: list[Config]) -> np.ndarray:
             predicted_mat = np.empty((MLUtil.__n_carts, len(configs)))
             for i in range(MLUtil.__n_carts):
-                predicted_mat[i] = MLUtil.__model.estimators_[i].predict(MLUtil.configs_to_nparray(configs))
+                predicted_mat[i] = MLUtil.model.estimators_[i].predict(MLUtil.configs_to_nparray(configs))
             return predicted_mat.mean(axis=0) + MLUtil.__alpha * predicted_mat.std(axis=0)
         
         MLUtil.f_acquist_all = acquist_all
@@ -204,7 +205,7 @@ class MLUtil(object):
     def __train_sklearn_model(configs: list[Config]) -> None:
         X = MLUtil.configs_to_nparray(configs)
         y = np.array([config.get_real_performance() for config in configs])
-        MLUtil.__model.fit(X, y)
+        MLUtil.model.fit(X, y)
 
 
     config_clazz: Dict[Config, int] = None

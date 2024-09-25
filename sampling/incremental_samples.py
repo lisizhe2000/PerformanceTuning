@@ -1,4 +1,8 @@
 import random
+
+import numpy as np
+
+import settings
 from data_processing.common import Common
 from sampling.map_elites import MapElites
 from settings import Settings
@@ -30,7 +34,7 @@ class IncrementalSampling(object):
     def batch_sample_knn_substitution(already_sampled: list[Config]) -> tuple[Config]:
         pool = Common().configs_pool
         configs = [config for config in pool if config not in already_sampled]
-        predicted_perfs = MLUtil.f_precict_all(configs)
+        predicted_perfs = MLUtil.f_predict_all(configs)
         configs = list(zip(configs, predicted_perfs))
         random.shuffle(configs)
 
@@ -114,3 +118,47 @@ class IncrementalSampling(object):
         map_elites.batch_update_archive(configs)
         return map_elites.sample_from_archive(best_n=Settings.best_n)
 
+    @staticmethod
+    @timeit
+    def min_acq_with_shapley_mutated(already_sampled: list[Config]) -> Config:
+        pool = Common().configs_pool
+        configs = [config for config in pool if config not in already_sampled]
+        acq_vals = MLUtil.f_acquist_all(configs)
+        min_acq_val = float('inf')
+        predicted_best: Config = None
+        for i in range(len(acq_vals)):
+            if acq_vals[i] < min_acq_val:
+                min_acq_val = acq_vals[i]
+                predicted_best = configs[i]
+        sorted_samples = sorted(already_sampled, key=lambda x: x.get_real_performance())
+        n = len(sorted_samples) // 2
+        med = sorted_samples[n]
+        delta_y = predicted_best.get_real_performance() - med.get_real_performance()
+        delta_X = [a - b for a, b in zip(predicted_best.config_options, med.config_options)]
+        shap = [abs(delta_y / dX) if dX != 0 else 1e-6 for dX in delta_X]
+        shap = np.array(shap)
+        r = random.random()
+        vec_mutated = shap / np.sum(shap) # 各个维度的shapley值归一化，得到每个维度的变异概率。每次变异只变异一个维度
+        best = predicted_best
+        if r < Settings.shapley_mutation_rate:
+            # 变异
+            r2 = random.random()
+            acc = 0
+            mutated_i = 0
+            for i, v in enumerate(vec_mutated):
+                acc += v
+                if r2 < acc:
+                    mutated_i = i
+            max_d = float('-inf')
+            for config in configs:
+                d = 0
+                mutated_dim_closest_config = min(sorted_samples, key=lambda x: abs(x.config_options[mutated_i] - config.config_options[mutated_i]))
+                d += 20 * abs(mutated_dim_closest_config.config_options[mutated_i] - config.config_options[mutated_i])
+                for i in range(len(config.config_options)):
+                    if i == mutated_i:
+                        continue
+                    d -= abs(predicted_best.config_options[i] - config.config_options[i])
+                if d < max_d:
+                    max_d = d
+                    best = config
+        return best

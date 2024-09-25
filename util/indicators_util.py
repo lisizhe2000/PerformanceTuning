@@ -36,7 +36,7 @@ class IndicatorsUtil(object):
     @staticmethod
     def print_indicators(**kwargs) -> None:
         rank = kwargs['rank']
-        predicted_performances = MLUtil.f_precict_all(Common().configs_pool)
+        predicted_performances = MLUtil.f_predict_all(Common().configs_pool)
         error_rate = IndicatorsUtil.eval_error_rate(predicted_performances)
         n3_percent_error_rate = IndicatorsUtil.eval_n_percent_error_rate(predicted_performances)
         n0_5_percent_error_rate = IndicatorsUtil.eval_n_percent_error_rate(predicted_performances, 0.005)

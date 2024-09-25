@@ -4,3 +4,4 @@ class Settings:
     epsilon = 0.2
     kmeans_n_clusters = 8
     best_n = 3
+    shapley_mutation_rate = 0.2
