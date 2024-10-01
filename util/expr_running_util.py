@@ -4,7 +4,7 @@ from pathlib import Path
 import re
 import subprocess
 import time
-from typing import Callable, Dict, Iterable
+from typing import Callable, Dict, Iterable, List
 
 import lightgbm as lgb
 import matplotlib
@@ -13,6 +13,8 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF
+
+from settings import Settings
 
 matplotlib.use('Agg')
 from sklearn.ensemble import AdaBoostRegressor, RandomForestRegressor
@@ -141,8 +143,8 @@ class ExprRunningUtil(object):
             f_ml_init()
         DistanceUtil.f_get_distance = f_distance
         
-        samples = f_init_sampling(Common().init_size)
-        while len(samples) < Common().total_size:
+        samples = f_init_sampling(Settings.init_size)
+        while len(samples) < Settings.total_size:
             MLUtil.f_train(samples)
             new = f_incremental_sampling(samples)
             if isinstance(new, Iterable):
@@ -175,7 +177,7 @@ class ExprRunningUtil(object):
         plt.savefig(f'{path}/{Common().sys_name}.png')
 
     @staticmethod
-    def save_result(rank_dict: Dict[str, list[int]]):
+    def save_result_rank(rank_dict: Dict[str, list[int]]):
         path = f'./Data/result/{datetime.today().strftime("%Y%m%d")}'
         for key, ranks in rank_dict.items():
             Path(f'{path}/{key}').mkdir(parents=True, exist_ok=True)
@@ -215,7 +217,87 @@ class ExprRunningUtil(object):
         rank_dict['flash'] = ranks_flash
         rank_dict['gil'] = ranks_gil
         ExprRunningUtil.comparative_boxplot(rank_dict)
-        ExprRunningUtil.save_result(rank_dict)
+        ExprRunningUtil.save_result_rank(rank_dict)
+
+    @staticmethod
+    def get_evaluation_count(f_ml_init: Callable[[], None],
+                             f_init_sampling: Callable[[int], list[Config]],
+                             f_incremental_sampling: Callable[[list[Config]], Config],
+                             ) -> List[int]:
+        f_ml_init()
+        samples = f_init_sampling(Settings.init_size)
+        evals = Settings.init_size
+        pool_size = len(Common().configs_pool)
+        n1, n2, n3 = pool_size * Settings.r1, pool_size * Settings.r2, pool_size * Settings.r3
+        r1, r2, r3 = 0, 0, 0
+        while True:
+            MLUtil.f_train(samples)
+            new = f_incremental_sampling(samples)
+            if isinstance(new, Iterable):
+                samples.extend(new)
+            else:
+                samples.append(new)
+            evals += 1
+            best = min(samples, key = lambda config: config.get_real_performance())
+            rank = IndicatorsUtil.get_rank(best, to_minimize=True)
+            if r1 == 0 and rank <= n1:
+                r1 = evals
+            if r2 == 0 and rank <= n2:
+                r2 = evals
+            if r3 == 0 and rank <= n3:
+                r3 = evals
+                break
+        return [r1, r2, r3]
+
+    @staticmethod
+    def run_evaluation_count(sys_name: str, repeats: int) -> None:
+        Common().load_csv(sys_name)
+        r1s, r2s, r3s = [], [], []
+        for _ in range(repeats):
+            r1, r2, r3 = ExprRunningUtil.get_evaluation_count(
+                MLUtil.using_epsilon_greedy,
+                InitSampling.random,
+                IncrementalSampling.min_acq_with_shapley_mutated,
+            )
+            r1s.append(r1)
+            r2s.append(r2)
+            r3s.append(r3)
+        print(f'r1: {r1s}, r2: {r2s}, r3: {r3s}')
+        print(f'mean r1: {sum(r1s) / len(r1s)}, mean r2: {sum(r2s) / len(r2s)}, mean r3: {sum(r3s) / len(r3s)}')
+        ExprRunningUtil.save_result_evaluation_count(r1s, r2s, r3s, 'sail')
+        r1s, r2s, r3s = [], [], []
+        for _ in range(repeats):
+            r1, r2, r3 = ExprRunningUtil.get_evaluation_count(
+                MLUtil.using_cart,
+                InitSampling.random,
+                IncrementalSampling.min_acquisition_in_once,
+            )
+            r1s.append(r1)
+            r2s.append(r2)
+            r3s.append(r3)
+        print(f'r1: {r1s}, r2: {r2s}, r3: {r3s}')
+        print(f'mean r1: {sum(r1s) / len(r1s)}, mean r2: {sum(r2s) / len(r2s)}, mean r3: {sum(r3s) / len(r3s)}')
+        ExprRunningUtil.save_result_evaluation_count(r1s, r2s, r3s, 'flash')
+        r1s, r2s, r3s = [], [], []
+        for _ in range(repeats):
+            r1, r2, r3 = ExprRunningUtil.get_evaluation_count(
+                MLUtil.using_ridge,
+                InitSampling.random,
+                IncrementalSampling.min_acquisition_in_once,
+            )
+            r1s.append(r1)
+            r2s.append(r2)
+            r3s.append(r3)
+        print(f'r1: {r1s}, r2: {r2s}, r3: {r3s}')
+        print(f'mean r1: {sum(r1s) / len(r1s)}, mean r2: {sum(r2s) / len(r2s)}, mean r3: {sum(r3s) / len(r3s)}')
+        ExprRunningUtil.save_result_evaluation_count(r1s, r2s, r3s, 'gil')
+
+    @staticmethod
+    def save_result_evaluation_count(r1s: List[int], r2s: List[int], r3s: List[int], alg: str):
+        path = f'./Data/result/{datetime.today().strftime("%Y%m%d")}/{alg}'
+        Path(path).mkdir(parents=True, exist_ok=True)
+        df = pd.DataFrame({f'到达前{Settings.r1}评估次数': r1s, f'到达前{Settings.r2}评估次数': r2s, f'到达前{Settings.r3}评估次数': r3s})
+        df.to_csv(f'{path}/{Common().sys_name}_eval_count.csv', index=False)
 
     @staticmethod
     def run_different_models(sys_name: str, repeats: int) -> None:
